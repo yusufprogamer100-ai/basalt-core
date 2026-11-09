@@ -6840,6 +6840,7 @@ end
 
 function Typography.Resolve(role: Role): Font
 	local cached = cache[role]
+
 	if cached then
 		return cached
 	end
@@ -6847,10 +6848,26 @@ function Typography.Resolve(role: Role): Font
 	local families = if role == "mono" then MONO else SANS
 	local weight = WEIGHTS[role]
 
+	
 	for _, name in ipairs(families) do
 		local face = tryFromName(name, weight)
+
 		if face then
 			cache[role] = face
+
+			return face
+		end
+	end
+
+	
+	local allFamilies = { "BuilderSans", "Montserrat", "SourceSans", "BuilderMono", "RobotoMono" }
+
+	for _, name in ipairs(allFamilies) do
+		local face = tryFromName(name, weight)
+
+		if face then
+			cache[role] = face
+
 			return face
 		end
 	end
@@ -6860,12 +6877,29 @@ function Typography.Resolve(role: Role): Font
 	local ok, face = pcall(function()
 		return Font.fromEnum(enumFace)
 	end)
+
 	if ok and face then
 		cache[role] = face
+
 		return face
 	end
 
-	error("Basalt: no usable font for role '" .. role .. "'", 2)
+	
+	local systemFace = pcall(function()
+		return Font.fromEnum(Enum.Font.BuilderSans)
+	end)
+
+	if systemFace then
+		cache[role] = systemFace
+
+		return systemFace
+	end
+
+	
+	local dummy = Font.fromEnum(Enum.Font.BuilderSansBold)
+	cache[role] = dummy
+
+	return dummy
 end
 
 function Typography.Reset()
