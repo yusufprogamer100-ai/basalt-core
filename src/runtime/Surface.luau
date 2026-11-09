@@ -221,7 +221,14 @@ function Surface:Apply(instance: Instance, props: Props): Instance
 	local target = instance :: any
 
 	for key, value in pairs(props) do
-		target[key] = value
+		if key == "Font" then
+			-- Executor'larda Font datatype direkt atanamıyor, pcall ile güvenli yap
+			pcall(function()
+				target.Font = value
+			end)
+		else
+			target[key] = value
+		end
 	end
 
 	return instance

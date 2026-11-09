@@ -8293,7 +8293,14 @@ function Surface:Apply(instance: Instance, props: Props): Instance
 	local target = instance :: any
 
 	for key, value in pairs(props) do
-		target[key] = value
+		if key == "Font" then
+			
+			pcall(function()
+				target.Font = value
+			end)
+		else
+			target[key] = value
+		end
 	end
 
 	return instance
