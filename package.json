@@ -1,6 +1,6 @@
 {
 	"name": "basalt",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Matte, keyboard-first UI library for Roblox.",
 	"private": true,
 	"type": "module",

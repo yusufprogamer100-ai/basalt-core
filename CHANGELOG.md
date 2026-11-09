@@ -6,6 +6,14 @@ All notable changes to Basalt are recorded here. The format follows Keep a Chang
 
 ### Added
 
+- Nothing yet.
+
+## 0.2.0
+
+Data controls. Dropdowns, keybinds, a color picker, a progress bar, a virtualized table and a console.
+
+### Added
+
 - `Section:Dropdown` and `Section:MultiDropdown`: single and multi select with 500-option support. Rows are a fixed pool (visible rows plus two), so the instance count does not grow with the option list.
 - Overlay layer above the window body: the top overlay owns Escape, arrow keys and Enter, closes on an outside click, and closes when the window hides, minimizes, drags, scales or switches tabs.
 - Dropdown popup flips above the field when there is no room below and clamps inside the layer. Positioning goes through one UIScale conversion.

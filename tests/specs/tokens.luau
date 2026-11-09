@@ -162,7 +162,7 @@ return function(h)
 
 			h:expect(Basalt.themeNames()[1]).ToBe("graphite")
 			h:expect(Basalt.theme("signal").name).ToBe("signal")
-			h:expect(Basalt.version).ToBe("0.1.0")
+			h:expect(Basalt.version).ToBe("0.2.0")
 		end)
 	end)
 

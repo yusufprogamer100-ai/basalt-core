@@ -34,7 +34,7 @@ local Palette = __require("design.Palette")
 local Surface = __require("runtime.Surface")
 local Window = __require("components.Window")
 
-local VERSION = "0.1.0"
+local VERSION = "0.2.0"
 
 export type Config = {
 	theme: string?,

@@ -4,7 +4,7 @@ Matte, keyboard-first UI library for Roblox.
 
 Basalt is built around one idea: an interface is a surface, not a decoration. Two surfaces, one hairline seam, one accent color. No gradients, no glass, no glow. Everything you see is there for a reason.
 
-> Status: pre-release, M2 in progress. The API is not stable until 1.0.
+> Status: pre-release, M2 complete. The API is not stable until 1.0.
 
 ## What ships today
 
@@ -30,13 +30,13 @@ Not shipped yet: modal, tooltip, context menu, search field, config panel, acces
 One pinned file, loaded once:
 
 ```lua
-local Basalt = loadstring(game:HttpGet("https://cdn.jsdelivr.net/gh/yusufprogamer100-ai/basalt-core@v0.1.0/dist/basalt.lua"))()
+local Basalt = loadstring(game:HttpGet("https://cdn.jsdelivr.net/gh/yusufprogamer100-ai/basalt-core@v0.2.0/dist/basalt.lua"))()
 ```
 
 jsDelivr is the primary address because it is fast and rarely blocked. If a network blocks it, use the tag archive instead:
 
 ```lua
-local Basalt = loadstring(game:HttpGet("https://raw.githubusercontent.com/yusufprogamer100-ai/basalt-core/v0.1.0/dist/basalt.lua"))()
+local Basalt = loadstring(game:HttpGet("https://raw.githubusercontent.com/yusufprogamer100-ai/basalt-core/v0.2.0/dist/basalt.lua"))()
 ```
 
 The URL is pinned to a tag on purpose. Basalt never fetches and runs code on its own; updating is a decision you make by changing the tag.
