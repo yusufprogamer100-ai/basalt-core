@@ -91,8 +91,8 @@ function Section.new(
 		local label = surface:Label({
 			Name = "Title",
 			Text = settings.title,
-			Font = surface:Font("title"),
-			TextSize = surface:Text("title"),
+			Font = surface:Font("h3"),
+			TextSize = surface:Text("h3"),
 			TextColor3 = surface:Color("ink"),
 			LayoutOrder = order,
 			Size = UDim2.new(1, 0, 0, 20),
@@ -107,8 +107,8 @@ function Section.new(
 		local note = surface:Label({
 			Name = "Note",
 			Text = settings.note,
-			Font = surface:Font("small"),
-			TextSize = surface:Text("small"),
+			Font = surface:Font("bodyLg"),
+			TextSize = surface:Text("bodyLg"),
 			TextColor3 = surface:Color("muted"),
 			LayoutOrder = order,
 			Size = UDim2.new(1, 0, 0, 14),

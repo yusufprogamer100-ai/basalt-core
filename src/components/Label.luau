@@ -10,7 +10,7 @@ export type Tone = "ink" | "muted" | "faint" | "accent" | "danger" | "success"
 export type Config = {
 	text: string?,
 	tone: Tone?,
-	size: "title" | "body" | "small" | "mono"?,
+	size: "caption" | "body" | "bodyLg" | "h3" | "h2" | "h1" | "mono"?,
 	wrap: boolean?,
 }
 

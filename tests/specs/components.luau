@@ -27,7 +27,7 @@ return function(h)
 		h:it("sets text, tone and value in one place", function()
 			Mock.Reset()
 			local surface = makeSurface()
-			local label = Label.new(surface, { text = "Ready", tone = "success", size = "small" })
+			local label = Label.new(surface, { text = "Ready", tone = "success", size = "mono" })
 
 			h:expect(label:GetValue()).ToBe("Ready")
 			h:expect(label.instance.TextColor3:ToHex()).ToBe("#6FB08A")

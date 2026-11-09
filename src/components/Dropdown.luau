@@ -208,8 +208,8 @@ function Dropdown.new(surface: Surface.Surface, config: Config?, layer: any): Dr
 		local note = surface:Label({
 			Name = "Note",
 			Text = noteText,
-			Font = surface:Font("small"),
-			TextSize = surface:Text("small"),
+			Font = surface:Font("bodyLg"),
+			TextSize = surface:Text("bodyLg"),
 			TextColor3 = surface:Color("muted"),
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextTruncate = Enum.TextTruncate.AtEnd,
@@ -223,7 +223,7 @@ function Dropdown.new(surface: Surface.Surface, config: Config?, layer: any): Dr
 	local maxRows = math.max(1, settings.maxRows or 6)
 	local listHeight = maxRows * rowHeight
 
-	local popup = surface:Elevated({
+	local popup = surface:Elevated(2, {
 		Name = "DropdownPopup",
 		Size = UDim2.fromOffset(240, listHeight + Tokens.Space.md),
 		Visible = false,
@@ -254,8 +254,8 @@ function Dropdown.new(surface: Surface.Surface, config: Config?, layer: any): Dr
 	local empty = surface:Label({
 		Name = "Empty",
 		Text = "No options",
-		Font = surface:Font("small"),
-		TextSize = surface:Text("small"),
+		Font = surface:Font("bodyLg"),
+		TextSize = surface:Text("bodyLg"),
 		TextColor3 = surface:Color("faint"),
 		TextXAlignment = Enum.TextXAlignment.Left,
 		BackgroundTransparency = 1,

@@ -3,13 +3,14 @@
 -- A theme is a contract, not a color swap. If a required color is missing the
 -- theme is rejected and the reason is printed. Silent fallbacks hide bugs.
 --
--- Modernization rationale (R-31):
--- * radiusSmall/Medium/Large replace the single 2-3px control radius.
---   Sharp 2px corners read as default Roblox; rounded 6-14px corners read as
---   a deliberate surface. Max 3 radii keeps the system consistent (R-11).
--- * surfaceElevated / surfaceOverlay add depth without glass or glow.
---   Elevation is a shadow-only signal (R-12, R-13): no blur, no neon.
--- * shadow config drives UIShadow on pop-out surfaces only.
+-- Modernization rationale (v0.4.0, R-31):
+-- * Depth tokens: surfaceElevated1/2/3 for layered elevation without glass.
+--   Each layer gets a distinct shadow blur spread so users read hierarchy.
+-- * Type scale: caption/body/bodyLg/h3/h2/h1 for deliberate hierarchy.
+--   Text sizes are not magic numbers chosen per component (R-31).
+-- * Radius tokens: max 3 values, tokenized for consistency (R-11).
+-- * Shadow config: UIShadow on elevated surfaces only (R-12, R-13).
+-- * Variant colors: primary uses accent as background (R-15 specific CTA).
 
 export type Density = "compact" | "comfortable"
 
@@ -36,8 +37,9 @@ Tokens.RequiredColors = {
 	"focus",
 	"scrim",
 	"selected",
-	"surfaceElevated",
-	"surfaceOverlay",
+	"surfaceElevated1",
+	"surfaceElevated2",
+	"surfaceElevated3",
 }
 
 -- 4px rhythm. Every value below is a multiple of 2 so half-pixel seams stay
@@ -71,21 +73,23 @@ Tokens.Size = {
 	badge = 16,
 }
 
--- Shadow config: UIShadow on elevated surfaces only. Not applied to every
+-- Shadow config: UIShadow on pop-out surfaces only. Not applied to every
 -- card (R-12); reserved for pop-outs and overlays.
 Tokens.Shadow = {
-	blur = 12,
-	spread = 0,
-	offset = 4,
+	elevated1 = { blur = 8, spread = 0, offset = 2, transparency = 0.35 },
+	elevated2 = { blur = 14, spread = 0, offset = 4, transparency = 0.5 },
+	elevated3 = { blur = 20, spread = 0, offset = 6, transparency = 0.6 },
 	color = "#000000",
-	transparency = 0.6,
 }
 
+-- Type scale: deliberate hierarchy, not arbitrary per-component sizes.
 Tokens.Text = {
-	title = 15,
-	body = 13,
-	small = 11,
-	micro = 10,
+	caption = 10,
+	body = 12,
+	bodyLg = 14,
+	h3 = 18,
+	h2 = 24,
+	h1 = 32,
 	mono = 11,
 }
 

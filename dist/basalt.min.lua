@@ -34,7 +34,7 @@ local Palette = __require("design.Palette")
 local Surface = __require("runtime.Surface")
 local Window = __require("components.Window")
 
-local VERSION = "0.3.0"
+local VERSION = "0.4.0"
 
 export type Config = {
 	theme: string?,
@@ -250,7 +250,7 @@ function Badge.new(surface: Surface.Surface, config: Config?): Badge
 		BorderSizePixel = 0,
 		Text = text,
 		TextColor3 = surface:Color(tone),
-		TextSize = surface:Text("micro"),
+		TextSize = surface:Text("caption"),
 		Font = surface:Font("mono"),
 		TextXAlignment = Enum.TextXAlignment.Center,
 		TextYAlignment = Enum.TextYAlignment.Center,
@@ -1248,8 +1248,8 @@ function Console.new(surface: Surface.Surface, config: Config?): Console
 		local label = surface:Label({
 			Name = "Title",
 			Text = settings.title,
-			Font = surface:Font("small"),
-			TextSize = surface:Text("small"),
+			Font = surface:Font("bodyLg"),
+			TextSize = surface:Text("bodyLg"),
 			TextColor3 = surface:Color("muted"),
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextTruncate = Enum.TextTruncate.AtEnd,
@@ -1275,7 +1275,7 @@ function Console.new(surface: Surface.Surface, config: Config?): Console
 		Name = "Empty",
 		Text = settings.emptyText or "No logs",
 		Font = surface:Font("body"),
-		TextSize = surface:Text("small"),
+		TextSize = surface:Text("bodyLg"),
 		TextColor3 = surface:Color("muted"),
 		TextXAlignment = Enum.TextXAlignment.Center,
 		Size = UDim2.new(1, 0, 0, height),
@@ -1718,8 +1718,8 @@ function Dropdown.new(surface: Surface.Surface, config: Config?, layer: any): Dr
 		local note = surface:Label({
 			Name = "Note",
 			Text = noteText,
-			Font = surface:Font("small"),
-			TextSize = surface:Text("small"),
+			Font = surface:Font("bodyLg"),
+			TextSize = surface:Text("bodyLg"),
 			TextColor3 = surface:Color("muted"),
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextTruncate = Enum.TextTruncate.AtEnd,
@@ -1733,7 +1733,7 @@ function Dropdown.new(surface: Surface.Surface, config: Config?, layer: any): Dr
 	local maxRows = math.max(1, settings.maxRows or 6)
 	local listHeight = maxRows * rowHeight
 
-	local popup = surface:Elevated({
+	local popup = surface:Elevated(2, {
 		Name = "DropdownPopup",
 		Size = UDim2.fromOffset(240, listHeight + Tokens.Space.md),
 		Visible = false,
@@ -1764,8 +1764,8 @@ function Dropdown.new(surface: Surface.Surface, config: Config?, layer: any): Dr
 	local empty = surface:Label({
 		Name = "Empty",
 		Text = "No options",
-		Font = surface:Font("small"),
-		TextSize = surface:Text("small"),
+		Font = surface:Font("bodyLg"),
+		TextSize = surface:Text("bodyLg"),
 		TextColor3 = surface:Color("faint"),
 		TextXAlignment = Enum.TextXAlignment.Left,
 		BackgroundTransparency = 1,
@@ -2891,8 +2891,8 @@ function Keybind.new(surface: Surface.Surface, config: Config?): Keybind
 		local noteLabel = surface:Label({
 			Name = "Note",
 			Text = noteText,
-			Font = surface:Font("small"),
-			TextSize = surface:Text("small"),
+			Font = surface:Font("bodyLg"),
+			TextSize = surface:Text("bodyLg"),
 			TextColor3 = surface:Color("muted"),
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextTruncate = Enum.TextTruncate.AtEnd,
@@ -2920,7 +2920,7 @@ function Keybind.new(surface: Surface.Surface, config: Config?): Keybind
 		Name = "Value",
 		Text = "None",
 		Font = surface:Font("mono"),
-		TextSize = surface:Text("small"),
+		TextSize = surface:Text("bodyLg"),
 		TextColor3 = surface:Color("muted"),
 		TextXAlignment = Enum.TextXAlignment.Center,
 		TextTruncate = Enum.TextTruncate.AtEnd,
@@ -3295,7 +3295,7 @@ export type Tone = "ink" | "muted" | "faint" | "accent" | "danger" | "success"
 export type Config = {
 	text: string?,
 	tone: Tone?,
-	size: "title" | "body" | "small" | "mono"?,
+	size: "caption" | "body" | "bodyLg" | "h3" | "h2" | "h1" | "mono"?,
 	wrap: boolean?,
 }
 
@@ -3761,8 +3761,8 @@ function Section.new(
 		local label = surface:Label({
 			Name = "Title",
 			Text = settings.title,
-			Font = surface:Font("title"),
-			TextSize = surface:Text("title"),
+			Font = surface:Font("h3"),
+			TextSize = surface:Text("h3"),
 			TextColor3 = surface:Color("ink"),
 			LayoutOrder = order,
 			Size = UDim2.new(1, 0, 0, 20),
@@ -3777,8 +3777,8 @@ function Section.new(
 		local note = surface:Label({
 			Name = "Note",
 			Text = settings.note,
-			Font = surface:Font("small"),
-			TextSize = surface:Text("small"),
+			Font = surface:Font("bodyLg"),
+			TextSize = surface:Text("bodyLg"),
 			TextColor3 = surface:Color("muted"),
 			LayoutOrder = order,
 			Size = UDim2.new(1, 0, 0, 14),
@@ -4809,8 +4809,8 @@ function Table.new(surface: Surface.Surface, config: Config?): Table
 		local headerCell = surface:Label({
 			Name = "Column" .. index,
 			Text = column.text or "",
-			Font = surface:Font("small"),
-			TextSize = surface:Text("small"),
+			Font = surface:Font("bodyLg"),
+			TextSize = surface:Text("bodyLg"),
 			TextColor3 = surface:Color("muted"),
 			TextXAlignment = ALIGNMENTS[column.align],
 			TextTruncate = Enum.TextTruncate.AtEnd,
@@ -4827,7 +4827,7 @@ function Table.new(surface: Surface.Surface, config: Config?): Table
 		Name = "Empty",
 		Text = settings.emptyText or "No rows",
 		Font = surface:Font("body"),
-		TextSize = surface:Text("small"),
+		TextSize = surface:Text("bodyLg"),
 		TextColor3 = surface:Color("muted"),
 		TextXAlignment = Enum.TextXAlignment.Center,
 		Size = UDim2.new(1, 0, 0, height),
@@ -4889,7 +4889,7 @@ function Table.new(surface: Surface.Surface, config: Config?): Table
 					Name = "Cell" .. position,
 					Text = "",
 					Font = surface:Font(if column.mono then "mono" else "body"),
-					TextSize = surface:Text(if column.mono then "mono" else "small"),
+					TextSize = surface:Text(if column.mono then "mono" else "bodyLg"),
 					TextColor3 = surface:Color("ink"),
 					TextXAlignment = ALIGNMENTS[column.align],
 					TextTruncate = Enum.TextTruncate.AtEnd,
@@ -5235,8 +5235,8 @@ function Toggle.new(surface: Surface.Surface, config: Config?): Toggle
 		local noteLabel = surface:Label({
 			Name = "Note",
 			Text = noteText,
-			Font = surface:Font("small"),
-			TextSize = surface:Text("small"),
+			Font = surface:Font("bodyLg"),
+			TextSize = surface:Text("bodyLg"),
 			TextColor3 = surface:Color("muted"),
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextTruncate = Enum.TextTruncate.AtEnd,
@@ -5607,7 +5607,7 @@ function Window.new(surface: Surface.Surface, config: Config?): Window
 	local gui = surface:ScreenGui("Basalt", settings.displayOrder)
 	set(gui, "Parent", surface:Parent())
 
-	local root = surface:Elevated({
+	local root = surface:Elevated(3, {
 		Name = "Root",
 		Size = fullSize,
 		Position = settings.position or rootPosition(width, height),
@@ -5648,8 +5648,8 @@ function Window.new(surface: Surface.Surface, config: Config?): Window
 	local title = surface:Label({
 		Name = "Title",
 		Text = settings.title or "Basalt",
-		Font = surface:Font("title"),
-		TextSize = surface:Text("title"),
+		Font = surface:Font("h3"),
+		TextSize = surface:Text("h3"),
 		TextColor3 = surface:Color("ink"),
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextTruncate = Enum.TextTruncate.AtEnd,
@@ -5662,8 +5662,8 @@ function Window.new(surface: Surface.Surface, config: Config?): Window
 	local subtitle = surface:Label({
 		Name = "Subtitle",
 		Text = settings.subtitle or "",
-		Font = surface:Font("small"),
-		TextSize = surface:Text("small"),
+		Font = surface:Font("body"),
+		TextSize = surface:Text("body"),
 		TextColor3 = surface:Color("muted"),
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextTruncate = Enum.TextTruncate.AtEnd,
@@ -6434,6 +6434,7 @@ __defs["design.Motion"] = function()
 
 
 
+
 export type Mode = "full" | "reduced"
 
 export type Token = "instant" | "fast" | "base" | "slow" | "spring"
@@ -6612,8 +6613,6 @@ __defs["design.Themes.bone"] = function()
 
 
 
-
-
 local theme = {
 	name = "bone",
 	colors = {
@@ -6632,8 +6631,9 @@ local theme = {
 		focus = "#8A5310",
 		scrim = "#1D1B18",
 		selected = "#E9E0CF",
-		surfaceElevated = "#EDE6D9",
-		surfaceOverlay = "#E2DACB",
+		surfaceElevated1 = "#F1EBDC",
+		surfaceElevated2 = "#EDE6D9",
+		surfaceElevated3 = "#E8DFD0",
 	},
 }
 
@@ -6669,8 +6669,9 @@ local theme = {
 		focus = "#E3A63C",
 		scrim = "#0B0A09",
 		selected = "#2E2820",
-		surfaceElevated = "#24211C",
-		surfaceOverlay = "#2E2A25",
+		surfaceElevated1 = "#24211C",
+		surfaceElevated2 = "#2B2822",
+		surfaceElevated3 = "#322E28",
 	},
 }
 
@@ -6767,8 +6768,9 @@ local theme = {
 		focus = "#FFC24B",
 		scrim = "#000000",
 		selected = "#1F1A0E",
-		surfaceElevated = "#141414",
-		surfaceOverlay = "#1E1E1E",
+		surfaceElevated1 = "#141414",
+		surfaceElevated2 = "#1E1E1E",
+		surfaceElevated3 = "#282828",
 	},
 }
 
@@ -6776,6 +6778,7 @@ return theme
 end
 
 __defs["design.Tokens"] = function()
+
 
 
 
@@ -6814,8 +6817,9 @@ Tokens.RequiredColors = {
 	"focus",
 	"scrim",
 	"selected",
-	"surfaceElevated",
-	"surfaceOverlay",
+	"surfaceElevated1",
+	"surfaceElevated2",
+	"surfaceElevated3",
 }
 
 
@@ -6852,18 +6856,20 @@ Tokens.Size = {
 
 
 Tokens.Shadow = {
-	blur = 12,
-	spread = 0,
-	offset = 4,
+	elevated1 = { blur = 8, spread = 0, offset = 2, transparency = 0.35 },
+	elevated2 = { blur = 14, spread = 0, offset = 4, transparency = 0.5 },
+	elevated3 = { blur = 20, spread = 0, offset = 6, transparency = 0.6 },
 	color = "#000000",
-	transparency = 0.6,
 }
 
+
 Tokens.Text = {
-	title = 15,
-	body = 13,
-	small = 11,
-	micro = 10,
+	caption = 10,
+	body = 12,
+	bodyLg = 14,
+	h3 = 18,
+	h2 = 24,
+	h1 = 32,
 	mono = 11,
 }
 
@@ -6930,22 +6936,22 @@ __defs["design.Typography"] = function()
 
 
 
-export type Role = "title" | "body" | "small" | "mono"
+export type Role = "caption" | "body" | "bodyLg" | "h3" | "h2" | "h1" | "mono"
 
 local SANS = { "BuilderSans", "Montserrat", "SourceSans" }
 local MONO = { "BuilderMono", "RobotoMono" }
 
 local WEIGHTS = {
-	title = Enum.FontWeight.Bold,
+	h3 = Enum.FontWeight.Bold,
 	body = Enum.FontWeight.Regular,
-	small = Enum.FontWeight.Medium,
+	bodyLg = Enum.FontWeight.Medium,
 	mono = Enum.FontWeight.Regular,
 }
 
 local FALLBACK_ENUM = {
-	title = Enum.Font.BuilderSansBold,
+	h3 = Enum.Font.BuilderSansBold,
 	body = Enum.Font.BuilderSans,
-	small = Enum.Font.BuilderSansMedium,
+	bodyLg = Enum.Font.BuilderSansMedium,
 	mono = Enum.Font.RobotoMono,
 }
 
@@ -8260,7 +8266,7 @@ export type Surface = {
 	Frame: (self: Surface, props: Props?) -> Instance,
 	Well: (self: Surface, props: Props?) -> Instance,
 	Raised: (self: Surface, props: Props?) -> Instance,
-	Elevated: (self: Surface, props: Props?) -> Instance,
+	Elevated: (self: Surface, level: number?, props: Props?) -> Instance,
 	Label: (self: Surface, props: Props?) -> Instance,
 	Button: (self: Surface, props: Props?) -> Instance,
 	Seam: (self: Surface, props: Props?) -> Instance,
@@ -8496,9 +8502,9 @@ end
 
 
 
-function Surface:Elevated(props: Props?): Instance
+function Surface:Elevated(level: number?, props: Props?): Instance
 	local merged: Props = {
-		BackgroundColor3 = self:Color("surfaceElevated"),
+		BackgroundColor3 = self:Color("surfaceElevated" .. tostring(level or 1)),
 		BorderSizePixel = 0,
 	}
 
@@ -8510,14 +8516,19 @@ function Surface:Elevated(props: Props?): Instance
 
 	
 	
+	local shadowConfig = if level == 2
+		then Tokens.Shadow.elevated2
+		elseif level == 3 then Tokens.Shadow.elevated3
+		else Tokens.Shadow.elevated1
+
 	local ok, shadow = pcall(function()
 		local s = Instance.new("UIShadow")
-		s.BlurRadius = Tokens.Shadow.blur
-		s.Spread = Tokens.Shadow.spread
-		s.Offset = Tokens.Shadow.offset
+		s.BlurRadius = shadowConfig.blur
+		s.Spread = shadowConfig.spread
+		s.Offset = shadowConfig.offset
 		local color = self:Color("scrim")
 		s.Color = color
-		s.Transparency = Tokens.Shadow.transparency
+		s.Transparency = shadowConfig.transparency
 		s.Parent = instance
 		return s
 	end)

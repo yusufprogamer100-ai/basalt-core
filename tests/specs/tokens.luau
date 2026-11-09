@@ -16,8 +16,8 @@ local MIN_RATIO = 4.5
 
 return function(h)
 	h:describe("Tokens", function()
-		h:it("declares all seventeen color tokens", function()
-			h:expect(#Tokens.RequiredColors).ToBe(17)
+		h:it("declares all eighteen color tokens", function()
+			h:expect(#Tokens.RequiredColors).ToBe(18)
 
 			local required = {
 				"frame",
@@ -35,8 +35,9 @@ return function(h)
 				"focus",
 				"scrim",
 				"selected",
-				"surfaceElevated",
-				"surfaceOverlay",
+				"surfaceElevated1",
+				"surfaceElevated2",
+				"surfaceElevated3",
 			}
 
 			for _, name in ipairs(required) do
@@ -48,7 +49,7 @@ return function(h)
 			local check = Tokens.Validate({ name = "broken", colors = {} })
 
 			h:expect(check.ok).ToBeFalsy()
-			h:expect(#check.missing).ToBe(17)
+			h:expect(#check.missing).ToBe(18)
 		end)
 
 		h:it("rejects a malformed hex value and names the token", function()
@@ -164,7 +165,7 @@ return function(h)
 
 			h:expect(Basalt.themeNames()[1]).ToBe("graphite")
 			h:expect(Basalt.theme("signal").name).ToBe("signal")
-			h:expect(Basalt.version).ToBe("0.3.0")
+			h:expect(Basalt.version).ToBe("0.4.0")
 		end)
 	end)
 

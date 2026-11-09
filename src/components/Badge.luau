@@ -46,7 +46,7 @@ function Badge.new(surface: Surface.Surface, config: Config?): Badge
 		BorderSizePixel = 0,
 		Text = text,
 		TextColor3 = surface:Color(tone),
-		TextSize = surface:Text("micro"),
+		TextSize = surface:Text("caption"),
 		Font = surface:Font("mono"),
 		TextXAlignment = Enum.TextXAlignment.Center,
 		TextYAlignment = Enum.TextYAlignment.Center,

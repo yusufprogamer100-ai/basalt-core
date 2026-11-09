@@ -3,10 +3,10 @@
 -- Default theme. Warm neutral graphite, never blue-black: the surface is meant
 -- to read as stone, and a blue cast makes it read as glass.
 --
--- surfaceElevated / surfaceOverlay add depth for pop-outs (dropdowns, popups).
--- They are lighter than frame so elevation reads as "above" without glow.
--- Measured pairs live in tests/specs/tokens.spec.luau. The source of truth is
--- the test, not this comment.
+-- Depth tokens (v0.4.0): surfaceElevated1/2/3 give layered elevation without
+-- glass or glow. Each is a step up from the one below, so elevation reads as
+-- "above" through color alone — never through decorative shadow stacking.
+-- Measured pairs live in tests/specs/tokens.spec.luau.
 
 local theme = {
 	name = "graphite",
@@ -26,8 +26,9 @@ local theme = {
 		focus = "#E3A63C",
 		scrim = "#0B0A09",
 		selected = "#2E2820",
-		surfaceElevated = "#24211C",
-		surfaceOverlay = "#2E2A25",
+		surfaceElevated1 = "#24211C",
+		surfaceElevated2 = "#2B2822",
+		surfaceElevated3 = "#322E28",
 	},
 }
 

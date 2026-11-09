@@ -10,7 +10,7 @@ local Palette = require(script.Parent.design.Palette)
 local Surface = require(script.Parent.runtime.Surface)
 local Window = require(script.Parent.components.Window)
 
-local VERSION = "0.3.0"
+local VERSION = "0.4.0"
 
 export type Config = {
 	theme: string?,

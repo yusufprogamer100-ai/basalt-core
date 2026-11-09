@@ -169,7 +169,7 @@ function Window.new(surface: Surface.Surface, config: Config?): Window
 	local gui = surface:ScreenGui("Basalt", settings.displayOrder)
 	set(gui, "Parent", surface:Parent())
 
-	local root = surface:Elevated({
+	local root = surface:Elevated(3, {
 		Name = "Root",
 		Size = fullSize,
 		Position = settings.position or rootPosition(width, height),
@@ -210,8 +210,8 @@ function Window.new(surface: Surface.Surface, config: Config?): Window
 	local title = surface:Label({
 		Name = "Title",
 		Text = settings.title or "Basalt",
-		Font = surface:Font("title"),
-		TextSize = surface:Text("title"),
+		Font = surface:Font("h3"),
+		TextSize = surface:Text("h3"),
 		TextColor3 = surface:Color("ink"),
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextTruncate = Enum.TextTruncate.AtEnd,
@@ -224,8 +224,8 @@ function Window.new(surface: Surface.Surface, config: Config?): Window
 	local subtitle = surface:Label({
 		Name = "Subtitle",
 		Text = settings.subtitle or "",
-		Font = surface:Font("small"),
-		TextSize = surface:Text("small"),
+		Font = surface:Font("body"),
+		TextSize = surface:Text("body"),
 		TextColor3 = surface:Color("muted"),
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextTruncate = Enum.TextTruncate.AtEnd,

@@ -96,8 +96,8 @@ function Toggle.new(surface: Surface.Surface, config: Config?): Toggle
 		local noteLabel = surface:Label({
 			Name = "Note",
 			Text = noteText,
-			Font = surface:Font("small"),
-			TextSize = surface:Text("small"),
+			Font = surface:Font("bodyLg"),
+			TextSize = surface:Text("bodyLg"),
 			TextColor3 = surface:Color("muted"),
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextTruncate = Enum.TextTruncate.AtEnd,

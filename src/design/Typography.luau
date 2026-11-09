@@ -4,22 +4,22 @@
 -- cleanly at 11px. Mono is used for numbers only, where tabular alignment
 -- stops values from jittering while a slider moves.
 
-export type Role = "title" | "body" | "small" | "mono"
+export type Role = "caption" | "body" | "bodyLg" | "h3" | "h2" | "h1" | "mono"
 
 local SANS = { "BuilderSans", "Montserrat", "SourceSans" }
 local MONO = { "BuilderMono", "RobotoMono" }
 
 local WEIGHTS = {
-	title = Enum.FontWeight.Bold,
+	h3 = Enum.FontWeight.Bold,
 	body = Enum.FontWeight.Regular,
-	small = Enum.FontWeight.Medium,
+	bodyLg = Enum.FontWeight.Medium,
 	mono = Enum.FontWeight.Regular,
 }
 
 local FALLBACK_ENUM = {
-	title = Enum.Font.BuilderSansBold,
+	h3 = Enum.Font.BuilderSansBold,
 	body = Enum.Font.BuilderSans,
-	small = Enum.Font.BuilderSansMedium,
+	bodyLg = Enum.Font.BuilderSansMedium,
 	mono = Enum.Font.RobotoMono,
 }
 

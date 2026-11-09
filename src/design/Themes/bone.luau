@@ -3,10 +3,8 @@
 -- Light theme. The well is the brightest surface so content sits on light,
 -- while the frame steps down to separate the enclosure from the page.
 --
--- surfaceElevated / surfaceOverlay add depth for pop-outs (dropdowns, popups).
--- On a light surface elevation reads as a subtle step up, not a shadow cast.
--- accent is a dark amber, not a yellow: on a light surface a bright amber
--- drops below 4.5:1 the moment it carries text.
+-- Depth tokens give layered elevation on light surfaces as subtle steps up,
+-- never as colored glows. accent remains dark amber for contrast reasons.
 
 local theme = {
 	name = "bone",
@@ -26,8 +24,9 @@ local theme = {
 		focus = "#8A5310",
 		scrim = "#1D1B18",
 		selected = "#E9E0CF",
-		surfaceElevated = "#EDE6D9",
-		surfaceOverlay = "#E2DACB",
+		surfaceElevated1 = "#F1EBDC",
+		surfaceElevated2 = "#EDE6D9",
+		surfaceElevated3 = "#E8DFD0",
 	},
 }
 

@@ -63,7 +63,7 @@ export type Surface = {
 	Frame: (self: Surface, props: Props?) -> Instance,
 	Well: (self: Surface, props: Props?) -> Instance,
 	Raised: (self: Surface, props: Props?) -> Instance,
-	Elevated: (self: Surface, props: Props?) -> Instance,
+	Elevated: (self: Surface, level: number?, props: Props?) -> Instance,
 	Label: (self: Surface, props: Props?) -> Instance,
 	Button: (self: Surface, props: Props?) -> Instance,
 	Seam: (self: Surface, props: Props?) -> Instance,
@@ -296,12 +296,12 @@ function Surface:Raised(props: Props?): Instance
 	return self:Create("Frame", merged)
 end
 
--- Elevated surfaces sit above the page (dropdowns, popups, overlays). They use
--- surfaceElevated (lighter than frame) plus shadow + radiusLarge so elevation
--- reads as "above" without glow or glass (R-12, R-13).
-function Surface:Elevated(props: Props?): Instance
+-- Elevated surfaces sit above the page (dropdowns, popups, overlays). Level
+-- picks depth: 1 = subtle, 2 = medium, 3 = strong. surfaceElevatedN colors plus
+-- shadow + radiusLarge so elevation reads as "above" without glow or glass.
+function Surface:Elevated(level: number?, props: Props?): Instance
 	local merged: Props = {
-		BackgroundColor3 = self:Color("surfaceElevated"),
+		BackgroundColor3 = self:Color("surfaceElevated" .. tostring(level or 1)),
 		BorderSizePixel = 0,
 	}
 
@@ -313,14 +313,19 @@ function Surface:Elevated(props: Props?): Instance
 
 	-- Shadow on pop-outs only: UIShadow is pcall-guarded so executors without
 	-- the capability don't crash the UI (executor-safe).
+	local shadowConfig = if level == 2
+		then Tokens.Shadow.elevated2
+		elseif level == 3 then Tokens.Shadow.elevated3
+		else Tokens.Shadow.elevated1
+
 	local ok, shadow = pcall(function()
 		local s = Instance.new("UIShadow")
-		s.BlurRadius = Tokens.Shadow.blur
-		s.Spread = Tokens.Shadow.spread
-		s.Offset = Tokens.Shadow.offset
+		s.BlurRadius = shadowConfig.blur
+		s.Spread = shadowConfig.spread
+		s.Offset = shadowConfig.offset
 		local color = self:Color("scrim")
 		s.Color = color
-		s.Transparency = Tokens.Shadow.transparency
+		s.Transparency = shadowConfig.transparency
 		s.Parent = instance
 		return s
 	end)

@@ -127,7 +127,7 @@ return function(h)
 			local label = surface:Label({ Text = "Value" })
 			h:expect(label.BackgroundTransparency).ToBe(1)
 			h:expect(label.TextColor3:ToHex()).ToBe("#EDE7DD")
-			h:expect(label.TextSize).ToBe(13)
+			h:expect(label.TextSize).ToBe(12)
 
 			local button = surface:Button({ Text = "Apply" })
 			h:expect(button.ClassName).ToBe("TextButton")

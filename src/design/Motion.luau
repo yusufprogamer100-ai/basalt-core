@@ -3,11 +3,12 @@
 -- Motion exists to explain a state change, nothing else. Reduced mode removes
 -- it entirely instead of shortening it to a flicker.
 --
--- Modernization rationale (R-19):
--- * Durations are long enough to be felt but short enough to stay snappy:
---   base 0.24s, slow 0.32s. Instant flips read as broken, not fast.
--- * "spring" token uses a custom spring curve for lift/press states so they
---   feel physical without overshooting.
+-- Modernization rationale (v0.4.0, R-19):
+-- * Spring physics for press/lift states so interaction feels physical without
+--   overshooting (spring token).
+-- * Staggered reveal for section content so tab changes feel intentional.
+-- * Durations long enough to be felt, short enough to stay snappy:
+--   fast 0.12s, base 0.24s, slow 0.32s.
 -- * Reduced mode still returns 0: accessibility first (R-32).
 
 export type Mode = "full" | "reduced"
