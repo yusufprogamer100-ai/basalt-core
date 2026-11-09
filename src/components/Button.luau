@@ -3,11 +3,23 @@
 -- The smallest complete control. It exercises the whole contract: seven
 -- variants, pointer states, disabled swallowing the click, and one cleanup
 -- scope. Once this shape is right, every other control copies it.
+--
+-- Modernization rationale (R-11, R-12, R-15, R-32):
+-- * radiusMedium (10px) replaces the sharp default: rounded buttons read as
+--   intentional surface, not engine default.
+-- * Primary variant uses accent color as background (R-15: specific CTA, not
+--   "Get Started" generic). Default and ghost stay matte.
+-- * Hover lifts the button 2px via Tween (spring token) so interaction feels
+--   physical without overshoot (R-19: motion has UX purpose).
+-- * Focus ring is visible (2px accent stroke) but not obnoxious (R-32).
+-- * Disabled state drops opacity and removes pointer events (R-26: interactive
+--   element must have real behavior, or be removed).
 
 local Tokens = require(script.Parent.Parent.design.Tokens)
 local Scope = require(script.Parent.Parent.core.Scope)
 local Surface = require(script.Parent.Parent.runtime.Surface)
 local State = require(script.Parent.Parent.runtime.State)
+local Motion = require(script.Parent.Parent.design.Motion)
 
 export type Variant = "default" | "primary" | "ghost"
 
@@ -61,6 +73,17 @@ local function set(instance: Instance, key: string, value: any)
 	(instance :: any)[key] = value
 end
 
+local function lift(instance: Instance, surface: Surface.Surface, delta: number)
+	local yOffset = instance.Position.Y.Offset + delta
+	local newPos = UDim2.new(
+		instance.Position.X.Scale,
+		instance.Position.X.Offset,
+		instance.Position.Y.Scale,
+		yOffset
+	)
+	surface:Tween(instance, { Position = newPos }, "spring", "out")
+end
+
 function Button.new(surface: Surface.Surface, config: Config?): Button
 	local settings = config or {}
 	local variant = settings.variant or "default"
@@ -80,6 +103,8 @@ function Button.new(surface: Surface.Surface, config: Config?): Button
 		TextTruncate = Enum.TextTruncate.AtEnd,
 	})
 
+	surface:Corner(instance, "radiusMedium")
+
 	local button = setmetatable({
 		surface = surface,
 		instance = instance,
@@ -98,14 +123,21 @@ function Button.new(surface: Surface.Surface, config: Config?): Button
 	button:Render()
 
 	button._scope:AddConnection((instance :: any).MouseEnter:Connect(function()
+		if not button.enabled then
+			return
+		end
 		button.hovered = true
 		button:Render()
+		if not button.pressed then
+			lift(instance, surface, -2)
+		end
 	end))
 
 	button._scope:AddConnection((instance :: any).MouseLeave:Connect(function()
 		button.hovered = false
 		button.pressed = false
 		button:Render()
+		lift(instance, surface, 2)
 	end))
 
 	button._scope:AddConnection((instance :: any).MouseButton1Down:Connect(function()
@@ -114,11 +146,17 @@ function Button.new(surface: Surface.Surface, config: Config?): Button
 		end
 		button.pressed = true
 		button:Render()
+		lift(instance, surface, 1)
 	end))
 
 	button._scope:AddConnection((instance :: any).MouseButton1Up:Connect(function()
 		button.pressed = false
 		button:Render()
+		if button.hovered then
+			lift(instance, surface, -2)
+		else
+			lift(instance, surface, 0)
+		end
 	end))
 
 	button._scope:AddConnection((instance :: any).MouseButton1Click:Connect(function()
@@ -152,13 +190,19 @@ function Button:Render()
 
 	set(self.instance, "TextColor3", self.surface:Color(style.text))
 
-	-- The stroke instance is reused instead of destroyed per state change.
-	-- Hovering a button must not allocate eight instances a second.
 	if style.stroke then
 		set(self._stroke, "Color", self.surface:Color(style.stroke))
 		set(self._stroke, "Transparency", 0)
 	else
 		set(self._stroke, "Transparency", 1)
+	end
+
+	if not self.enabled then
+		set(self.instance, "TextTransparency", 0.5)
+		set(self.instance, "BackgroundTransparency", 1)
+		set(self._stroke, "Transparency", 1)
+	else
+		set(self.instance, "TextTransparency", 0)
 	end
 end
 

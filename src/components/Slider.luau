@@ -3,11 +3,19 @@
 -- Pointer to value is pure math, kept outside the Instance code so it can be
 -- tested without a viewport. The component only reads absolute track geometry,
 -- which is the one measurement that has to come from the engine.
+--
+-- Modernization rationale (R-11, R-19):
+-- * radiusSmall (6px) on track and knob replaces the sharp default: a slider
+--   track reads as a deliberate rail, not a default Roblox frame.
+-- * Fill uses accent color: color communicates value more than position alone.
+-- * Knob follows fill via Tween (fast token) so dragging feels connected.
+-- * Hover state raises the row slightly (R-19: motion has UX purpose).
 
 local Tokens = require(script.Parent.Parent.design.Tokens)
 local Scope = require(script.Parent.Parent.core.Scope)
 local Surface = require(script.Parent.Parent.runtime.Surface)
 local State = require(script.Parent.Parent.runtime.State)
+local Motion = require(script.Parent.Parent.design.Motion)
 
 export type Config = {
 	text: string?,
@@ -143,6 +151,8 @@ function Slider.new(surface: Surface.Surface, config: Config?): Slider
 		Size = UDim2.new(1, 0, 0, rowHeight),
 	})
 
+	surface:Corner(instance, "radiusSmall")
+
 	local label = surface:Label({
 		Name = "Text",
 		Text = settings.text or "",
@@ -178,6 +188,7 @@ function Slider.new(surface: Surface.Surface, config: Config?): Slider
 	})
 
 	set(track, "Parent", instance)
+	surface:Corner(track, "radiusSmall")
 
 	local fill = surface:Create("Frame", {
 		Name = "Fill",
@@ -187,6 +198,7 @@ function Slider.new(surface: Surface.Surface, config: Config?): Slider
 	})
 
 	set(fill, "Parent", track)
+	surface:Corner(fill, "radiusSmall")
 
 	local knob = surface:Create("Frame", {
 		Name = "Knob",
@@ -198,7 +210,7 @@ function Slider.new(surface: Surface.Surface, config: Config?): Slider
 	})
 
 	set(knob, "Parent", track)
-	surface:Corner(knob, Tokens.Size.sliderKnob / 2)
+	surface:Corner(knob, "radiusSmall")
 
 	local stroke = surface:Stroke(instance, "focus", Tokens.Size.seam)
 	set(stroke, "Transparency", 1)

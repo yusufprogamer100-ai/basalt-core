@@ -161,7 +161,7 @@ function Progress.new(surface: Surface.Surface, config: Config?): Progress
 	})
 
 	set(track, "Parent", instance)
-	surface:Corner(track, Tokens.Size.radiusControl)
+	surface:Corner(track, "radiusSmall")
 
 	local fill = surface:Frame({
 		Name = "Fill",
@@ -171,7 +171,7 @@ function Progress.new(surface: Surface.Surface, config: Config?): Progress
 	})
 
 	set(fill, "Parent", track)
-	surface:Corner(fill, Tokens.Size.radiusControl)
+	surface:Corner(fill, "radiusSmall")
 
 	local progress = setmetatable({
 		surface = surface,

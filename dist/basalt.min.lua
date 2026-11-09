@@ -34,7 +34,7 @@ local Palette = __require("design.Palette")
 local Surface = __require("runtime.Surface")
 local Window = __require("components.Window")
 
-local VERSION = "0.2.0"
+local VERSION = "0.3.0"
 
 export type Config = {
 	theme: string?,
@@ -313,10 +313,22 @@ __defs["components.Button"] = function()
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 local Tokens = __require("design.Tokens")
 local Scope = __require("core.Scope")
 local Surface = __require("runtime.Surface")
 local State = __require("runtime.State")
+local Motion = __require("design.Motion")
 
 export type Variant = "default" | "primary" | "ghost"
 
@@ -370,6 +382,17 @@ local function set(instance: Instance, key: string, value: any)
 	(instance :: any)[key] = value
 end
 
+local function lift(instance: Instance, surface: Surface.Surface, delta: number)
+	local yOffset = instance.Position.Y.Offset + delta
+	local newPos = UDim2.new(
+		instance.Position.X.Scale,
+		instance.Position.X.Offset,
+		instance.Position.Y.Scale,
+		yOffset
+	)
+	surface:Tween(instance, { Position = newPos }, "spring", "out")
+end
+
 function Button.new(surface: Surface.Surface, config: Config?): Button
 	local settings = config or {}
 	local variant = settings.variant or "default"
@@ -389,6 +412,8 @@ function Button.new(surface: Surface.Surface, config: Config?): Button
 		TextTruncate = Enum.TextTruncate.AtEnd,
 	})
 
+	surface:Corner(instance, "radiusMedium")
+
 	local button = setmetatable({
 		surface = surface,
 		instance = instance,
@@ -407,14 +432,21 @@ function Button.new(surface: Surface.Surface, config: Config?): Button
 	button:Render()
 
 	button._scope:AddConnection((instance :: any).MouseEnter:Connect(function()
+		if not button.enabled then
+			return
+		end
 		button.hovered = true
 		button:Render()
+		if not button.pressed then
+			lift(instance, surface, -2)
+		end
 	end))
 
 	button._scope:AddConnection((instance :: any).MouseLeave:Connect(function()
 		button.hovered = false
 		button.pressed = false
 		button:Render()
+		lift(instance, surface, 2)
 	end))
 
 	button._scope:AddConnection((instance :: any).MouseButton1Down:Connect(function()
@@ -423,11 +455,17 @@ function Button.new(surface: Surface.Surface, config: Config?): Button
 		end
 		button.pressed = true
 		button:Render()
+		lift(instance, surface, 1)
 	end))
 
 	button._scope:AddConnection((instance :: any).MouseButton1Up:Connect(function()
 		button.pressed = false
 		button:Render()
+		if button.hovered then
+			lift(instance, surface, -2)
+		else
+			lift(instance, surface, 0)
+		end
 	end))
 
 	button._scope:AddConnection((instance :: any).MouseButton1Click:Connect(function()
@@ -461,13 +499,19 @@ function Button:Render()
 
 	set(self.instance, "TextColor3", self.surface:Color(style.text))
 
-	
-	
 	if style.stroke then
 		set(self._stroke, "Color", self.surface:Color(style.stroke))
 		set(self._stroke, "Transparency", 0)
 	else
 		set(self._stroke, "Transparency", 1)
+	end
+
+	if not self.enabled then
+		set(self.instance, "TextTransparency", 0.5)
+		set(self.instance, "BackgroundTransparency", 1)
+		set(self._stroke, "Transparency", 1)
+	else
+		set(self.instance, "TextTransparency", 0)
 	end
 end
 
@@ -1248,6 +1292,7 @@ function Console.new(surface: Surface.Surface, config: Config?): Console
 	})
 
 	set(list.frame, "Position", UDim2.new(0, 0, 0, HEADER_HEIGHT + Tokens.Size.seam))
+	surface:Corner(list.frame, "radiusSmall")
 
 	local console = setmetatable({
 		surface = surface,
@@ -1637,7 +1682,7 @@ function Dropdown.new(surface: Surface.Surface, config: Config?, layer: any): Dr
 	})
 
 	set(field, "Parent", instance)
-	surface:Corner(field, Tokens.Size.radiusControl)
+	surface:Corner(field, "radiusSmall")
 
 	local stroke = surface:Stroke(field, "seam")
 
@@ -1688,16 +1733,13 @@ function Dropdown.new(surface: Surface.Surface, config: Config?, layer: any): Dr
 	local maxRows = math.max(1, settings.maxRows or 6)
 	local listHeight = maxRows * rowHeight
 
-	local popup = surface:Raised({
+	local popup = surface:Elevated({
 		Name = "DropdownPopup",
 		Size = UDim2.fromOffset(240, listHeight + Tokens.Space.md),
 		Visible = false,
 		ZIndex = 60,
 		ClipsDescendants = true,
 	})
-
-	surface:Corner(popup, Tokens.Size.radiusPanel)
-	surface:Stroke(popup, "seamStrong")
 
 	if layer then
 		set(popup, "Parent", layer.frame)
@@ -2436,6 +2478,14 @@ __defs["components.Input"] = function()
 
 
 
+
+
+
+
+
+
+
+
 local Tokens = __require("design.Tokens")
 local Scope = __require("core.Scope")
 local Surface = __require("runtime.Surface")
@@ -2496,6 +2546,8 @@ function Input.new(surface: Surface.Surface, config: Config?): Input
 		Size = UDim2.new(1, 0, 0, rowHeight),
 	})
 
+	surface:Corner(instance, "radiusSmall")
+
 	local label = surface:Label({
 		Name = "Text",
 		Text = settings.text or "",
@@ -2526,6 +2578,7 @@ function Input.new(surface: Surface.Surface, config: Config?): Input
 	})
 
 	set(box, "Parent", instance)
+	surface:Corner(box, "radiusSmall")
 	surface:Pad(box, Tokens.Space.xs + 2)
 
 	local stroke = surface:Stroke(box, "seam", Tokens.Size.seam)
@@ -2859,7 +2912,7 @@ function Keybind.new(surface: Surface.Surface, config: Config?): Keybind
 	})
 
 	set(chip, "Parent", instance)
-	surface:Corner(chip, Tokens.Size.radiusControl)
+	surface:Corner(chip, "radiusSmall")
 
 	local chipStroke = surface:Stroke(chip, "seam")
 
@@ -3506,7 +3559,7 @@ function Progress.new(surface: Surface.Surface, config: Config?): Progress
 	})
 
 	set(track, "Parent", instance)
-	surface:Corner(track, Tokens.Size.radiusControl)
+	surface:Corner(track, "radiusSmall")
 
 	local fill = surface:Frame({
 		Name = "Fill",
@@ -3516,7 +3569,7 @@ function Progress.new(surface: Surface.Surface, config: Config?): Progress
 	})
 
 	set(fill, "Parent", track)
-	surface:Corner(fill, Tokens.Size.radiusControl)
+	surface:Corner(fill, "radiusSmall")
 
 	local progress = setmetatable({
 		surface = surface,
@@ -3878,10 +3931,18 @@ __defs["components.Slider"] = function()
 
 
 
+
+
+
+
+
+
+
 local Tokens = __require("design.Tokens")
 local Scope = __require("core.Scope")
 local Surface = __require("runtime.Surface")
 local State = __require("runtime.State")
+local Motion = __require("design.Motion")
 
 export type Config = {
 	text: string?,
@@ -4017,6 +4078,8 @@ function Slider.new(surface: Surface.Surface, config: Config?): Slider
 		Size = UDim2.new(1, 0, 0, rowHeight),
 	})
 
+	surface:Corner(instance, "radiusSmall")
+
 	local label = surface:Label({
 		Name = "Text",
 		Text = settings.text or "",
@@ -4052,6 +4115,7 @@ function Slider.new(surface: Surface.Surface, config: Config?): Slider
 	})
 
 	set(track, "Parent", instance)
+	surface:Corner(track, "radiusSmall")
 
 	local fill = surface:Create("Frame", {
 		Name = "Fill",
@@ -4061,6 +4125,7 @@ function Slider.new(surface: Surface.Surface, config: Config?): Slider
 	})
 
 	set(fill, "Parent", track)
+	surface:Corner(fill, "radiusSmall")
 
 	local knob = surface:Create("Frame", {
 		Name = "Knob",
@@ -4072,7 +4137,7 @@ function Slider.new(surface: Surface.Surface, config: Config?): Slider
 	})
 
 	set(knob, "Parent", track)
-	surface:Corner(knob, Tokens.Size.sliderKnob / 2)
+	surface:Corner(knob, "radiusSmall")
 
 	local stroke = surface:Stroke(instance, "focus", Tokens.Size.seam)
 	set(stroke, "Transparency", 1)
@@ -5079,10 +5144,19 @@ __defs["components.Toggle"] = function()
 
 
 
+
+
+
+
+
+
+
+
 local Tokens = __require("design.Tokens")
 local Scope = __require("core.Scope")
 local Surface = __require("runtime.Surface")
 local State = __require("runtime.State")
+local Motion = __require("design.Motion")
 
 export type Config = {
 	text: string?,
@@ -5142,6 +5216,8 @@ function Toggle.new(surface: Surface.Surface, config: Config?): Toggle
 		Size = UDim2.new(1, 0, 0, rowHeight),
 	})
 
+	surface:Corner(instance, "radiusSmall")
+
 	local label = surface:Label({
 		Name = "Text",
 		Text = settings.text or "",
@@ -5172,15 +5248,17 @@ function Toggle.new(surface: Surface.Surface, config: Config?): Toggle
 		note = noteLabel
 	end
 
-	local track = surface:Raised({
+	local track = surface:Create("Frame", {
 		Name = "Track",
 		Size = UDim2.fromOffset(Tokens.Size.toggleWidth, Tokens.Size.toggleHeight),
 		AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, -Tokens.Space.lg, 0.5, 0),
+		BackgroundColor3 = surface:Color("raised"),
+		BorderSizePixel = 0,
 	})
 
 	set(track, "Parent", instance)
-	surface:Corner(track, Tokens.Size.toggleHeight / 2)
+	surface:Corner(track, "radiusSmall")
 
 	local knob = surface:Create("Frame", {
 		Name = "Knob",
@@ -5192,7 +5270,7 @@ function Toggle.new(surface: Surface.Surface, config: Config?): Toggle
 	})
 
 	set(knob, "Parent", track)
-	surface:Corner(knob, Tokens.Size.toggleKnob / 2)
+	surface:Corner(knob, "radiusSmall")
 
 	local toggle = setmetatable({
 		surface = surface,
@@ -5260,18 +5338,16 @@ function Toggle:Render()
 
 	set(self._track, "BackgroundColor3", self.surface:Color(trackToken))
 	set(self._knob, "BackgroundColor3", self.surface:Color(knobToken))
-	set(
-		self._knob,
-		"Position",
-		UDim2.new(
-			0,
-			if on
-				then Tokens.Size.toggleWidth - Tokens.Size.toggleKnob - Tokens.Space.xxs
-				else Tokens.Space.xxs,
-			0.5,
-			0
-		)
-	)
+
+	
+	
+	
+	local targetX = if on
+		then Tokens.Size.toggleWidth - Tokens.Size.toggleKnob - Tokens.Space.xxs
+		else Tokens.Space.xxs
+
+	set(self._knob, "Position", UDim2.new(0, targetX, 0.5, 0))
+
 	set(self._label, "TextColor3", self.surface:Color(if self.enabled then "ink" else "faint"))
 
 	if self._note then
@@ -5531,7 +5607,7 @@ function Window.new(surface: Surface.Surface, config: Config?): Window
 	local gui = surface:ScreenGui("Basalt", settings.displayOrder)
 	set(gui, "Parent", surface:Parent())
 
-	local root = surface:Frame({
+	local root = surface:Elevated({
 		Name = "Root",
 		Size = fullSize,
 		Position = settings.position or rootPosition(width, height),
@@ -6351,15 +6427,23 @@ __defs["design.Motion"] = function()
 
 
 
+
+
+
+
+
+
+
 export type Mode = "full" | "reduced"
 
-export type Token = "instant" | "fast" | "base" | "slow"
+export type Token = "instant" | "fast" | "base" | "slow" | "spring"
 
 local DURATION: { [Token]: number } = {
 	instant = 0,
 	fast = 0.12,
-	base = 0.18,
-	slow = 0.24,
+	base = 0.24,
+	slow = 0.32,
+	spring = 0.28,
 }
 
 local EASING: { [string]: Enum.EasingStyle } = {
@@ -6368,8 +6452,6 @@ local EASING: { [string]: Enum.EasingStyle } = {
 	inOut = Enum.EasingStyle.Sine,
 	linear = Enum.EasingStyle.Linear,
 }
-
-
 
 local DIRECTION: { [string]: Enum.EasingDirection } = {
 	["in"] = Enum.EasingDirection.In,
@@ -6530,6 +6612,8 @@ __defs["design.Themes.bone"] = function()
 
 
 
+
+
 local theme = {
 	name = "bone",
 	colors = {
@@ -6548,6 +6632,8 @@ local theme = {
 		focus = "#8A5310",
 		scrim = "#1D1B18",
 		selected = "#E9E0CF",
+		surfaceElevated = "#EDE6D9",
+		surfaceOverlay = "#E2DACB",
 	},
 }
 
@@ -6555,6 +6641,8 @@ return theme
 end
 
 __defs["design.Themes.graphite"] = function()
+
+
 
 
 
@@ -6581,6 +6669,8 @@ local theme = {
 		focus = "#E3A63C",
 		scrim = "#0B0A09",
 		selected = "#2E2820",
+		surfaceElevated = "#24211C",
+		surfaceOverlay = "#2E2A25",
 	},
 }
 
@@ -6656,6 +6746,9 @@ __defs["design.Themes.signal"] = function()
 
 
 
+
+
+
 local theme = {
 	name = "signal",
 	colors = {
@@ -6674,6 +6767,8 @@ local theme = {
 		focus = "#FFC24B",
 		scrim = "#000000",
 		selected = "#1F1A0E",
+		surfaceElevated = "#141414",
+		surfaceOverlay = "#1E1E1E",
 	},
 }
 
@@ -6681,6 +6776,14 @@ return theme
 end
 
 __defs["design.Tokens"] = function()
+
+
+
+
+
+
+
+
 
 
 
@@ -6711,6 +6814,8 @@ Tokens.RequiredColors = {
 	"focus",
 	"scrim",
 	"selected",
+	"surfaceElevated",
+	"surfaceOverlay",
 }
 
 
@@ -6731,8 +6836,10 @@ Tokens.Size = {
 	rail = { compact = 148, comfortable = 160 },
 	gap = { compact = 8, comfortable = 10 },
 	pad = { compact = 12, comfortable = 14 },
-	radiusPanel = 3,
-	radiusControl = 2,
+	
+	radiusSmall = 6,
+	radiusMedium = 10,
+	radiusLarge = 14,
 	seam = 1,
 	toggleWidth = 30,
 	toggleHeight = 16,
@@ -6740,6 +6847,16 @@ Tokens.Size = {
 	sliderTrack = 4,
 	sliderKnob = 12,
 	badge = 16,
+}
+
+
+
+Tokens.Shadow = {
+	blur = 12,
+	spread = 0,
+	offset = 4,
+	color = "#000000",
+	transparency = 0.6,
 }
 
 Tokens.Text = {
@@ -6793,6 +6910,14 @@ end
 
 function Tokens.Header(density: Density): number
 	return Tokens.Size.header[density]
+end
+
+function Tokens.Radius(size: string): number
+	local value = Tokens.Size[size]
+	if type(value) ~= "number" then
+		error(string.format("Basalt: no radius token '%s'", tostring(size)), 2)
+	end
+	return value
 end
 
 return Tokens
@@ -8080,6 +8205,11 @@ __defs["runtime.Surface"] = function()
 
 
 
+
+
+
+
+
 local Registry = __require("core.Registry")
 local Scope = __require("core.Scope")
 local Typography = __require("design.Typography")
@@ -8130,11 +8260,13 @@ export type Surface = {
 	Frame: (self: Surface, props: Props?) -> Instance,
 	Well: (self: Surface, props: Props?) -> Instance,
 	Raised: (self: Surface, props: Props?) -> Instance,
+	Elevated: (self: Surface, props: Props?) -> Instance,
 	Label: (self: Surface, props: Props?) -> Instance,
 	Button: (self: Surface, props: Props?) -> Instance,
 	Seam: (self: Surface, props: Props?) -> Instance,
 	ScreenGui: (self: Surface, name: string, displayOrder: number?) -> Instance,
-	Corner: (self: Surface, instance: Instance, radius: number?) -> Instance,
+	Corner: (self: Surface, instance: Instance, radius: string | number?) -> Instance,
+	Shadow: (self: Surface, instance: Instance) -> Instance?,
 	Stroke: (self: Surface, instance: Instance, colorName: string, thickness: number?) -> Instance,
 	Scale: (self: Surface, instance: Instance, scale: number?) -> Instance,
 	Pad: (self: Surface, instance: Instance, padding: number?) -> Instance,
@@ -8361,6 +8493,44 @@ function Surface:Raised(props: Props?): Instance
 	return self:Create("Frame", merged)
 end
 
+
+
+
+function Surface:Elevated(props: Props?): Instance
+	local merged: Props = {
+		BackgroundColor3 = self:Color("surfaceElevated"),
+		BorderSizePixel = 0,
+	}
+
+	for key, value in pairs(props or {}) do
+		merged[key] = value
+	end
+
+	local instance = self:Create("Frame", merged)
+
+	
+	
+	local ok, shadow = pcall(function()
+		local s = Instance.new("UIShadow")
+		s.BlurRadius = Tokens.Shadow.blur
+		s.Spread = Tokens.Shadow.spread
+		s.Offset = Tokens.Shadow.offset
+		local color = self:Color("scrim")
+		s.Color = color
+		s.Transparency = Tokens.Shadow.transparency
+		s.Parent = instance
+		return s
+	end)
+
+	if not ok then
+		
+	end
+
+	self:Corner(instance, "radiusLarge")
+
+	return instance
+end
+
 function Surface:Label(props: Props?): Instance
 	local merged: Props = {
 		BackgroundTransparency = 1,
@@ -8424,9 +8594,21 @@ function Surface:ScreenGui(name: string, displayOrder: number?): Instance
 	return gui
 end
 
-function Surface:Corner(instance: Instance, radius: number?): Instance
+
+
+function Surface:Corner(instance: Instance, radius: string | number?): Instance
+	local radiusValue: number
+
+	if type(radius) == "string" then
+		radiusValue = Tokens.Radius(radius)
+	elseif type(radius) == "number" then
+		radiusValue = radius
+	else
+		radiusValue = Tokens.Size.radiusControl
+	end
+
 	local corner = self:Create("UICorner", {
-		CornerRadius = UDim.new(0, radius or Tokens.Size.radiusControl),
+		CornerRadius = UDim.new(0, radiusValue),
 	})
 	local target = corner :: any
 	target.Parent = instance

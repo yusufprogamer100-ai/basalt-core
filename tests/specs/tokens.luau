@@ -16,8 +16,8 @@ local MIN_RATIO = 4.5
 
 return function(h)
 	h:describe("Tokens", function()
-		h:it("declares all fifteen color tokens", function()
-			h:expect(#Tokens.RequiredColors).ToBe(15)
+		h:it("declares all seventeen color tokens", function()
+			h:expect(#Tokens.RequiredColors).ToBe(17)
 
 			local required = {
 				"frame",
@@ -35,6 +35,8 @@ return function(h)
 				"focus",
 				"scrim",
 				"selected",
+				"surfaceElevated",
+				"surfaceOverlay",
 			}
 
 			for _, name in ipairs(required) do
@@ -46,7 +48,7 @@ return function(h)
 			local check = Tokens.Validate({ name = "broken", colors = {} })
 
 			h:expect(check.ok).ToBeFalsy()
-			h:expect(#check.missing).ToBe(15)
+			h:expect(#check.missing).ToBe(17)
 		end)
 
 		h:it("rejects a malformed hex value and names the token", function()
@@ -162,7 +164,7 @@ return function(h)
 
 			h:expect(Basalt.themeNames()[1]).ToBe("graphite")
 			h:expect(Basalt.theme("signal").name).ToBe("signal")
-			h:expect(Basalt.version).ToBe("0.2.0")
+			h:expect(Basalt.version).ToBe("0.3.0")
 		end)
 	end)
 
@@ -170,8 +172,8 @@ return function(h)
 		h:it("uses the planned durations", function()
 			h:expect(Motion.Duration("instant", "full")).ToBe(0)
 			h:expect(Motion.Duration("fast", "full")).ToBe(0.12)
-			h:expect(Motion.Duration("base", "full")).ToBe(0.18)
-			h:expect(Motion.Duration("slow", "full")).ToBe(0.24)
+			h:expect(Motion.Duration("base", "full")).ToBe(0.24)
+			h:expect(Motion.Duration("slow", "full")).ToBe(0.32)
 		end)
 
 		h:it("removes motion entirely in reduced mode", function()
@@ -182,7 +184,7 @@ return function(h)
 		h:it("builds TweenInfo with the requested easing and direction", function()
 			local info = Motion.Info("base", "full", "outStrong", "in")
 
-			h:expect(info.Time).ToBe(0.18)
+			h:expect(info.Time).ToBe(0.24)
 			h:expect(info.EasingStyle).ToBe(Mock.Enum.EasingStyle.Quart)
 			h:expect(info.EasingDirection).ToBe(Mock.Enum.EasingDirection.In)
 		end)

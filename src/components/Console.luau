@@ -149,6 +149,7 @@ function Console.new(surface: Surface.Surface, config: Config?): Console
 	})
 
 	set(list.frame, "Position", UDim2.new(0, 0, 0, HEADER_HEIGHT + Tokens.Size.seam))
+	surface:Corner(list.frame, "radiusSmall")
 
 	local console = setmetatable({
 		surface = surface,

@@ -165,7 +165,7 @@ function Keybind.new(surface: Surface.Surface, config: Config?): Keybind
 	})
 
 	set(chip, "Parent", instance)
-	surface:Corner(chip, Tokens.Size.radiusControl)
+	surface:Corner(chip, "radiusSmall")
 
 	local chipStroke = surface:Stroke(chip, "seam")
 

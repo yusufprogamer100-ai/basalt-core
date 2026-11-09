@@ -169,7 +169,7 @@ function Window.new(surface: Surface.Surface, config: Config?): Window
 	local gui = surface:ScreenGui("Basalt", settings.displayOrder)
 	set(gui, "Parent", surface:Parent())
 
-	local root = surface:Frame({
+	local root = surface:Elevated({
 		Name = "Root",
 		Size = fullSize,
 		Position = settings.position or rootPosition(width, height),

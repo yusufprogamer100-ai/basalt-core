@@ -3,6 +3,14 @@
 -- A label and a real TextBox. The field uses the `field` role, so focus,
 -- invalid and disabled states come from the same table as every other control
 -- instead of being re-invented here.
+--
+-- Modernization rationale (R-11, R-32):
+-- * radiusSmall (6px) on the field replaces the sharp default: an input field
+--   reads as a deliberate surface, not a default Roblox frame.
+-- * Focus stroke uses accent color: the focus indicator is visible and useful
+--   without being obnoxious (R-32: visible focus indicator).
+-- * Hover stroke uses seamStrong: a subtle signal that the field is interactive.
+-- * Invalid state uses danger color: color communicates state clearly.
 
 local Tokens = require(script.Parent.Parent.design.Tokens)
 local Scope = require(script.Parent.Parent.core.Scope)
@@ -64,6 +72,8 @@ function Input.new(surface: Surface.Surface, config: Config?): Input
 		Size = UDim2.new(1, 0, 0, rowHeight),
 	})
 
+	surface:Corner(instance, "radiusSmall")
+
 	local label = surface:Label({
 		Name = "Text",
 		Text = settings.text or "",
@@ -94,6 +104,7 @@ function Input.new(surface: Surface.Surface, config: Config?): Input
 	})
 
 	set(box, "Parent", instance)
+	surface:Corner(box, "radiusSmall")
 	surface:Pad(box, Tokens.Space.xs + 2)
 
 	local stroke = surface:Stroke(box, "seam", Tokens.Size.seam)

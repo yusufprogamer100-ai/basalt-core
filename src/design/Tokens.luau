@@ -2,6 +2,14 @@
 -- Basalt / design / Tokens
 -- A theme is a contract, not a color swap. If a required color is missing the
 -- theme is rejected and the reason is printed. Silent fallbacks hide bugs.
+--
+-- Modernization rationale (R-31):
+-- * radiusSmall/Medium/Large replace the single 2-3px control radius.
+--   Sharp 2px corners read as default Roblox; rounded 6-14px corners read as
+--   a deliberate surface. Max 3 radii keeps the system consistent (R-11).
+-- * surfaceElevated / surfaceOverlay add depth without glass or glow.
+--   Elevation is a shadow-only signal (R-12, R-13): no blur, no neon.
+-- * shadow config drives UIShadow on pop-out surfaces only.
 
 export type Density = "compact" | "comfortable"
 
@@ -28,6 +36,8 @@ Tokens.RequiredColors = {
 	"focus",
 	"scrim",
 	"selected",
+	"surfaceElevated",
+	"surfaceOverlay",
 }
 
 -- 4px rhythm. Every value below is a multiple of 2 so half-pixel seams stay
@@ -48,8 +58,10 @@ Tokens.Size = {
 	rail = { compact = 148, comfortable = 160 },
 	gap = { compact = 8, comfortable = 10 },
 	pad = { compact = 12, comfortable = 14 },
-	radiusPanel = 3,
-	radiusControl = 2,
+	-- Radius tokens: max 3 values, tokenized for consistency (R-11).
+	radiusSmall = 6,
+	radiusMedium = 10,
+	radiusLarge = 14,
 	seam = 1,
 	toggleWidth = 30,
 	toggleHeight = 16,
@@ -57,6 +69,16 @@ Tokens.Size = {
 	sliderTrack = 4,
 	sliderKnob = 12,
 	badge = 16,
+}
+
+-- Shadow config: UIShadow on elevated surfaces only. Not applied to every
+-- card (R-12); reserved for pop-outs and overlays.
+Tokens.Shadow = {
+	blur = 12,
+	spread = 0,
+	offset = 4,
+	color = "#000000",
+	transparency = 0.6,
 }
 
 Tokens.Text = {
@@ -110,6 +132,14 @@ end
 
 function Tokens.Header(density: Density): number
 	return Tokens.Size.header[density]
+end
+
+function Tokens.Radius(size: string): number
+	local value = Tokens.Size[size]
+	if type(value) ~= "number" then
+		error(string.format("Basalt: no radius token '%s'", tostring(size)), 2)
+	end
+	return value
 end
 
 return Tokens

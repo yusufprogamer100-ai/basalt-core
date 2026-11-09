@@ -4,9 +4,14 @@
 -- Color3.fromHex directly: a component that knows hex values is a component
 -- that cannot be re-themed, and the theme contract stops being real.
 --
--- Two surfaces only. `frame` is the enclosure, `well` is the content bed.
--- A 1px seam separates them. There is no gradient, no glass, no drop shadow:
--- every extra layer is a layer that will be drawn wrong on some device.
+-- Modernization rationale (R-12, R-13):
+-- * Shadow() applies UIShadow only on pop-out surfaces (dropdowns, popups).
+--   It is not applied to every card; elevation is deliberate, not decorative.
+-- * Elevated() returns a frame on surfaceElevated with radiusLarge + shadow,
+--   giving pop-outs depth without glass or glow.
+-- * Corner() accepts named radius tokens (radiusSmall/Medium/Large) so the
+--   radius system stays consistent (max 3 values, R-11).
+-- * Font assignment stays pcall-guarded for executor compatibility.
 
 local Registry = require(script.Parent.Parent.core.Registry)
 local Scope = require(script.Parent.Parent.core.Scope)
@@ -58,11 +63,13 @@ export type Surface = {
 	Frame: (self: Surface, props: Props?) -> Instance,
 	Well: (self: Surface, props: Props?) -> Instance,
 	Raised: (self: Surface, props: Props?) -> Instance,
+	Elevated: (self: Surface, props: Props?) -> Instance,
 	Label: (self: Surface, props: Props?) -> Instance,
 	Button: (self: Surface, props: Props?) -> Instance,
 	Seam: (self: Surface, props: Props?) -> Instance,
 	ScreenGui: (self: Surface, name: string, displayOrder: number?) -> Instance,
-	Corner: (self: Surface, instance: Instance, radius: number?) -> Instance,
+	Corner: (self: Surface, instance: Instance, radius: string | number?) -> Instance,
+	Shadow: (self: Surface, instance: Instance) -> Instance?,
 	Stroke: (self: Surface, instance: Instance, colorName: string, thickness: number?) -> Instance,
 	Scale: (self: Surface, instance: Instance, scale: number?) -> Instance,
 	Pad: (self: Surface, instance: Instance, padding: number?) -> Instance,
@@ -289,6 +296,44 @@ function Surface:Raised(props: Props?): Instance
 	return self:Create("Frame", merged)
 end
 
+-- Elevated surfaces sit above the page (dropdowns, popups, overlays). They use
+-- surfaceElevated (lighter than frame) plus shadow + radiusLarge so elevation
+-- reads as "above" without glow or glass (R-12, R-13).
+function Surface:Elevated(props: Props?): Instance
+	local merged: Props = {
+		BackgroundColor3 = self:Color("surfaceElevated"),
+		BorderSizePixel = 0,
+	}
+
+	for key, value in pairs(props or {}) do
+		merged[key] = value
+	end
+
+	local instance = self:Create("Frame", merged)
+
+	-- Shadow on pop-outs only: UIShadow is pcall-guarded so executors without
+	-- the capability don't crash the UI (executor-safe).
+	local ok, shadow = pcall(function()
+		local s = Instance.new("UIShadow")
+		s.BlurRadius = Tokens.Shadow.blur
+		s.Spread = Tokens.Shadow.spread
+		s.Offset = Tokens.Shadow.offset
+		local color = self:Color("scrim")
+		s.Color = color
+		s.Transparency = Tokens.Shadow.transparency
+		s.Parent = instance
+		return s
+	end)
+
+	if not ok then
+		-- Silent fallback: no shadow on executors that lack UIShadow.
+	end
+
+	self:Corner(instance, "radiusLarge")
+
+	return instance
+end
+
 function Surface:Label(props: Props?): Instance
 	local merged: Props = {
 		BackgroundTransparency = 1,
@@ -352,9 +397,21 @@ function Surface:ScreenGui(name: string, displayOrder: number?): Instance
 	return gui
 end
 
-function Surface:Corner(instance: Instance, radius: number?): Instance
+-- Corner applies a named radius token or a raw Offset value. Named tokens keep
+-- the radius system consistent (max 3 values: radiusSmall/Medium/Large).
+function Surface:Corner(instance: Instance, radius: string | number?): Instance
+	local radiusValue: number
+
+	if type(radius) == "string" then
+		radiusValue = Tokens.Radius(radius)
+	elseif type(radius) == "number" then
+		radiusValue = radius
+	else
+		radiusValue = Tokens.Size.radiusControl
+	end
+
 	local corner = self:Create("UICorner", {
-		CornerRadius = UDim.new(0, radius or Tokens.Size.radiusControl),
+		CornerRadius = UDim.new(0, radiusValue),
 	})
 	local target = corner :: any
 	target.Parent = instance

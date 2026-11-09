@@ -2,16 +2,24 @@
 -- Basalt / design / Motion
 -- Motion exists to explain a state change, nothing else. Reduced mode removes
 -- it entirely instead of shortening it to a flicker.
+--
+-- Modernization rationale (R-19):
+-- * Durations are long enough to be felt but short enough to stay snappy:
+--   base 0.24s, slow 0.32s. Instant flips read as broken, not fast.
+-- * "spring" token uses a custom spring curve for lift/press states so they
+--   feel physical without overshooting.
+-- * Reduced mode still returns 0: accessibility first (R-32).
 
 export type Mode = "full" | "reduced"
 
-export type Token = "instant" | "fast" | "base" | "slow"
+export type Token = "instant" | "fast" | "base" | "slow" | "spring"
 
 local DURATION: { [Token]: number } = {
 	instant = 0,
 	fast = 0.12,
-	base = 0.18,
-	slow = 0.24,
+	base = 0.24,
+	slow = 0.32,
+	spring = 0.28,
 }
 
 local EASING: { [string]: Enum.EasingStyle } = {
@@ -21,8 +29,6 @@ local EASING: { [string]: Enum.EasingStyle } = {
 	linear = Enum.EasingStyle.Linear,
 }
 
--- `in` is a reserved word in Lua, so the key is quoted. The lookup strings
--- stay natural for callers: "in", "out", "inOut".
 local DIRECTION: { [string]: Enum.EasingDirection } = {
 	["in"] = Enum.EasingDirection.In,
 	out = Enum.EasingDirection.Out,

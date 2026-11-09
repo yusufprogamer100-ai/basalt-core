@@ -3,6 +3,9 @@
 -- High contrast theme for low vision, not a decorative "neon" mode. Black well,
 -- white ink, amber reserved for signal and focus. No color is used to carry
 -- meaning on its own.
+--
+-- surfaceElevated / surfaceOverlay keep the high-contrast contract: they are
+-- steps of gray, never colored, so elevation never becomes a signal of its own.
 
 local theme = {
 	name = "signal",
@@ -22,6 +25,8 @@ local theme = {
 		focus = "#FFC24B",
 		scrim = "#000000",
 		selected = "#1F1A0E",
+		surfaceElevated = "#141414",
+		surfaceOverlay = "#1E1E1E",
 	},
 }
 

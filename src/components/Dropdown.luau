@@ -172,7 +172,7 @@ function Dropdown.new(surface: Surface.Surface, config: Config?, layer: any): Dr
 	})
 
 	set(field, "Parent", instance)
-	surface:Corner(field, Tokens.Size.radiusControl)
+	surface:Corner(field, "radiusSmall")
 
 	local stroke = surface:Stroke(field, "seam")
 
@@ -223,16 +223,13 @@ function Dropdown.new(surface: Surface.Surface, config: Config?, layer: any): Dr
 	local maxRows = math.max(1, settings.maxRows or 6)
 	local listHeight = maxRows * rowHeight
 
-	local popup = surface:Raised({
+	local popup = surface:Elevated({
 		Name = "DropdownPopup",
 		Size = UDim2.fromOffset(240, listHeight + Tokens.Space.md),
 		Visible = false,
 		ZIndex = 60,
 		ClipsDescendants = true,
 	})
-
-	surface:Corner(popup, Tokens.Size.radiusPanel)
-	surface:Stroke(popup, "seamStrong")
 
 	if layer then
 		set(popup, "Parent", layer.frame)
