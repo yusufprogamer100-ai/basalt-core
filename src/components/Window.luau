@@ -12,6 +12,7 @@ local Drag = require(script.Parent.Parent.runtime.Drag)
 local Layout = require(script.Parent.Parent.runtime.Layout)
 local Focus = require(script.Parent.Parent.runtime.Focus)
 local Input = require(script.Parent.Parent.runtime.Input)
+local Layer = require(script.Parent.Parent.runtime.Layer)
 local Button = require(script.Parent.Button)
 local Tab = require(script.Parent.Tab)
 
@@ -42,6 +43,7 @@ export type Window = {
 	minimizeButton: Instance?,
 	grip: Instance?,
 	uiScale: Instance,
+	layerScale: Instance,
 	headerHeight: number,
 	minimized: boolean,
 	destroyed: boolean,
@@ -50,12 +52,14 @@ export type Window = {
 	_focus: Focus.Focus,
 	_toggleClaim: Input.Claim?,
 	_search: any?,
+	_layer: Layer.Layer,
 	_fullHeight: UDim2,
 	_tabs: { Tab.Tab },
 	_activeTab: Tab.Tab?,
 
 	GetGui: (self: Window) -> Instance,
 	GetRoot: (self: Window) -> Instance,
+	GetLayer: (self: Window) -> Layer.Layer,
 	GetContent: (self: Window) -> Instance,
 	IsVisible: (self: Window) -> boolean,
 	IsTyping: (self: Window) -> boolean,
@@ -147,6 +151,7 @@ function Window.new(surface: Surface.Surface, config: Config?): Window
 		minimizeButton = nil :: any,
 		grip = nil :: any,
 		uiScale = nil :: any,
+		layerScale = nil :: any,
 		headerHeight = headerHeight,
 		minimized = false,
 		destroyed = false,
@@ -155,6 +160,7 @@ function Window.new(surface: Surface.Surface, config: Config?): Window
 		_focus = Focus.new(),
 		_toggleClaim = toggleClaim,
 		_search = nil,
+		_layer = nil :: any,
 		_fullHeight = fullSize,
 		_tabs = {} :: { Tab.Tab },
 		_activeTab = nil :: Tab.Tab?,
@@ -173,6 +179,26 @@ function Window.new(surface: Surface.Surface, config: Config?): Window
 	set(root, "Parent", gui)
 
 	local uiScale = surface:Scale(root, 1)
+
+	-- Overlays are siblings of the root, not children: the root clips its
+	-- contents, and a dropdown near the bottom edge must be able to open past
+	-- the window instead of being cut off. The layer mirrors the root scale
+	-- with its own UIScale so popups live in the same pixel space.
+	local layerFrame = surface:Frame({
+		Name = "Overlay",
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.fromScale(1, 1),
+		ZIndex = 55,
+		ClipsDescendants = false,
+	})
+
+	set(layerFrame, "Parent", gui)
+
+	local layerScale = surface:Scale(layerFrame, 1)
+	local layer = Layer.new(layerFrame, function(): number
+		return prop(layerScale, "Scale")
+	end)
 
 	local header = surface:Well({
 		Name = "Header",
@@ -335,6 +361,17 @@ function Window.new(surface: Surface.Surface, config: Config?): Window
 		}))
 	end
 
+	-- A drag invalidates every popup position. Closing on the first press is
+	-- cheaper and more honest than trying to re-anchor a list mid-drag.
+	window._scope:AddConnection((header :: any).InputBegan:Connect(function(input: any)
+		if
+			input.UserInputType == Enum.UserInputType.MouseButton1
+			or input.UserInputType == Enum.UserInputType.Touch
+		then
+			layer:Clear()
+		end
+	end))
+
 	window.gui = gui
 	window.root = root
 	window.header = header
@@ -347,6 +384,8 @@ function Window.new(surface: Surface.Surface, config: Config?): Window
 	window.minimizeButton = minimizeButton
 	window.grip = grip
 	window.uiScale = uiScale
+	window.layerScale = layerScale
+	window._layer = layer
 
 	local inputService = game:GetService("UserInputService")
 
@@ -373,6 +412,10 @@ function Window:GetContent(): Instance
 	return self.content
 end
 
+function Window:GetLayer(): Layer.Layer
+	return self._layer
+end
+
 function Window:IsVisible(): boolean
 	return prop(self.gui, "Enabled") == true
 end
@@ -390,6 +433,7 @@ function Window:Hide()
 		return
 	end
 
+	self._layer:Clear()
 	self._focus:Clear()
 	set(self.gui, "Enabled", false)
 end
@@ -457,6 +501,17 @@ function Window:HandleInput(input: any, gameProcessed: boolean?): boolean
 		return false
 	end
 
+	-- A press outside an open overlay closes it before the click reaches the
+	-- control underneath. Inside presses return false so the row still works.
+	if
+		input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch
+	then
+		if self._layer:Dismiss(input) then
+			return true
+		end
+	end
+
 	local action = Input.ActionFor(input, keyDown)
 
 	-- A focused TextBox owns typing. Navigation keys still leave the field, but
@@ -488,7 +543,22 @@ function Window:HandleInput(input: any, gameProcessed: boolean?): boolean
 		return false
 	end
 
+	-- An open overlay owns the keyboard while it is on top. The dropdown uses
+	-- Up and Down to move its highlight and Escape to close; anything it does
+	-- not claim (Tab, shortcuts) falls through to the window.
+	local overlay = self._layer:Top()
+
+	if overlay and type(overlay.HandleAction) == "function" then
+		local ok, handled = pcall(overlay.HandleAction, overlay, action)
+
+		if ok and handled == true then
+			return true
+		end
+	end
+
 	if action == "next" or action == "previous" then
+		-- Focus is leaving the field, so the list it opened cannot stay.
+		self._layer:CloseTop()
 		self._focus:Next(if action == "previous" then -1 else 1)
 		return true
 	end
@@ -520,6 +590,10 @@ function Window:HandleInput(input: any, gameProcessed: boolean?): boolean
 	end
 
 	if action == "escape" then
+		if self._layer:CloseTop() then
+			return true
+		end
+
 		self._focus:Clear()
 		return true
 	end
@@ -568,7 +642,15 @@ function Window:SetSubtitle(text: string)
 end
 
 function Window:SetScale(value: number)
-	set(self.uiScale, "Scale", math.clamp(value, 0.5, 2))
+	local scale = math.clamp(value, 0.5, 2)
+
+	-- Popup geometry was measured at the old scale. Close instead of guessing.
+	if scale ~= prop(self.uiScale, "Scale") then
+		self._layer:Clear()
+	end
+
+	set(self.uiScale, "Scale", scale)
+	set(self.layerScale, "Scale", scale)
 end
 
 function Window:Minimize()
@@ -576,6 +658,7 @@ function Window:Minimize()
 		return
 	end
 
+	self._layer:Clear()
 	self._fullHeight = prop(self.root, "Size")
 	self.minimized = true
 
@@ -631,6 +714,10 @@ function Window:SelectTab(tab: Tab.Tab)
 		return
 	end
 
+	-- A popup belongs to the page that opened it. Switching pages closes it
+	-- before the field it was anchored to disappears.
+	self._layer:Clear()
+
 	for _, other in ipairs(self._tabs) do
 		if other ~= tab then
 			other:Deactivate()
@@ -661,6 +748,7 @@ function Window:Destroy()
 		self._toggleClaim = nil
 	end
 
+	self._layer:Destroy()
 	self._focus:Destroy()
 
 	self._scope:Destroy()

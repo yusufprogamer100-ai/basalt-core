@@ -13,6 +13,7 @@ local Button = require(script.Parent.Button)
 local Toggle = require(script.Parent.Toggle)
 local Slider = require(script.Parent.Slider)
 local Input = require(script.Parent.Input)
+local Dropdown = require(script.Parent.Dropdown)
 local Label = require(script.Parent.Label)
 local Divider = require(script.Parent.Divider)
 local Badge = require(script.Parent.Badge)
@@ -31,6 +32,7 @@ export type Section = {
 	destroyed: boolean,
 	_scope: Scope.Scope,
 	_focus: Focus.Focus?,
+	_layer: any,
 	_order: number,
 
 	Add: (self: Section, instance: Instance) -> Instance,
@@ -38,6 +40,8 @@ export type Section = {
 	Toggle: (self: Section, config: Toggle.Config?) -> Toggle.Toggle,
 	Slider: (self: Section, config: Slider.Config?) -> Slider.Slider,
 	Input: (self: Section, config: Input.Config?) -> Input.Input,
+	Dropdown: (self: Section, config: Dropdown.Config?) -> Dropdown.Dropdown,
+	MultiDropdown: (self: Section, config: Dropdown.Config?) -> Dropdown.Dropdown,
 	Label: (self: Section, config: Label.Config?) -> Label.Label,
 	Divider: (self: Section, config: Divider.Config?) -> Divider.Divider,
 	Badge: (self: Section, config: Badge.Config?) -> Badge.Badge,
@@ -56,7 +60,8 @@ function Section.new(
 	surface: Surface.Surface,
 	parent: Instance,
 	config: Config?,
-	focus: Focus.Focus?
+	focus: Focus.Focus?,
+	layer: any
 ): Section
 	local settings = config or {}
 
@@ -124,6 +129,7 @@ function Section.new(
 		destroyed = false,
 		_scope = Scope.new(),
 		_focus = focus,
+		_layer = layer,
 		_order = 1,
 	}, Section)
 
@@ -171,6 +177,19 @@ end
 
 function Section:Input(config: Input.Config?): Input.Input
 	return attach(self, Input.new(self.surface, config))
+end
+
+function Section:Dropdown(config: Dropdown.Config?): Dropdown.Dropdown
+	return attach(self, Dropdown.new(self.surface, config, self._layer))
+end
+
+-- The plan treats multi select as its own control. It is the same list with a
+-- different value contract, so it is one flag instead of a second component.
+function Section:MultiDropdown(config: Dropdown.Config?): Dropdown.Dropdown
+	local merged = table.clone(config or {})
+	merged.multi = true
+
+	return self:Dropdown(merged)
 end
 
 function Section:Label(config: Label.Config?): Label.Label

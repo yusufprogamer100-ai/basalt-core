@@ -6,9 +6,13 @@ All notable changes to Basalt are recorded here. The format follows Keep a Chang
 
 ### Added
 
-- `Basalt.new({ density = "auto" })` reads the last input type and picks `comfortable` for touch and gamepad, `compact` for keyboard and mouse.
+- `Section:Dropdown` and `Section:MultiDropdown`: single and multi select with 500-option support. Rows are a fixed pool (visible rows plus two), so the instance count does not grow with the option list.
+- Overlay layer above the window body: the top overlay owns Escape, arrow keys and Enter, closes on an outside click, and closes when the window hides, minimizes, drags, scales or switches tabs.
+- Dropdown popup flips above the field when there is no room below and clamps inside the layer. Positioning goes through one UIScale conversion.
+- `density = "auto"` reads the last input type and picks `comfortable` for touch and gamepad, `compact` for keyboard and mouse.
 - App level `toggleKey`, overridable per window.
 - `density` and `toggleKey` are exposed on the returned App so a caller can confirm what was resolved without duplicating the measurement.
+- 128 headless specs, including a 500-option open measured against the 16ms frame budget.
 
 ## 0.1.0
 

@@ -15,6 +15,8 @@ require(script.Parent.specs.window)(h)
 require(script.Parent.specs.controls)(h)
 require(script.Parent.specs.components)(h)
 require(script.Parent.specs.keyboard)(h)
+require(script.Parent.specs.layer)(h)
+require(script.Parent.specs.dropdown)(h)
 
 local ok = h:run()
 

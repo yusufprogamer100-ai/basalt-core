@@ -161,7 +161,8 @@ function Tab:section(config: Section.Config?): Section.Section
 		self.surface,
 		self.page,
 		config,
-		if self._window then self._window._focus else nil
+		if self._window then self._window._focus else nil,
+		if self._window then self._window._layer else nil
 	)
 	table.insert(self._sections, section)
 	self._scope:Add(section)
