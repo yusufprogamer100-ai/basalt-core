@@ -15,6 +15,8 @@ local Slider = require(script.Parent.Slider)
 local Input = require(script.Parent.Input)
 local Dropdown = require(script.Parent.Dropdown)
 local Keybind = require(script.Parent.Keybind)
+local Progress = require(script.Parent.Progress)
+local Table = require(script.Parent.Table)
 local Label = require(script.Parent.Label)
 local Divider = require(script.Parent.Divider)
 local Badge = require(script.Parent.Badge)
@@ -44,6 +46,8 @@ export type Section = {
 	Dropdown: (self: Section, config: Dropdown.Config?) -> Dropdown.Dropdown,
 	MultiDropdown: (self: Section, config: Dropdown.Config?) -> Dropdown.Dropdown,
 	Keybind: (self: Section, config: Keybind.Config?) -> Keybind.Keybind,
+	Progress: (self: Section, config: Progress.Config?) -> Progress.Progress,
+	Table: (self: Section, config: Table.Config?) -> Table.Table,
 	Label: (self: Section, config: Label.Config?) -> Label.Label,
 	Divider: (self: Section, config: Divider.Config?) -> Divider.Divider,
 	Badge: (self: Section, config: Badge.Config?) -> Badge.Badge,
@@ -196,6 +200,14 @@ end
 
 function Section:Keybind(config: Keybind.Config?): Keybind.Keybind
 	return attach(self, Keybind.new(self.surface, config))
+end
+
+function Section:Progress(config: Progress.Config?): Progress.Progress
+	return attach(self, Progress.new(self.surface, config))
+end
+
+function Section:Table(config: Table.Config?): Table.Table
+	return attach(self, Table.new(self.surface, config))
 end
 
 function Section:Label(config: Label.Config?): Label.Label

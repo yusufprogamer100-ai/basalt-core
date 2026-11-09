@@ -590,6 +590,18 @@ function Window:HandleInput(input: any, gameProcessed: boolean?): boolean
 	end
 
 	if action == "up" or action == "down" then
+		local current = self._focus:Current()
+
+		-- A table owns Up and Down to move its selection; everything else
+		-- falls through to spatial focus movement.
+		if current and type(current.HandleArrow) == "function" then
+			local ok, handled = pcall(current.HandleArrow, current, action)
+
+			if ok and handled == true then
+				return true
+			end
+		end
+
 		self._focus:Move(action)
 		return true
 	end

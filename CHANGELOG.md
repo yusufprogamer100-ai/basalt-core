@@ -11,10 +11,13 @@ All notable changes to Basalt are recorded here. The format follows Keep a Chang
 - Dropdown popup flips above the field when there is no room below and clamps inside the layer. Positioning goes through one UIScale conversion.
 - `Section:Keybind`: click or Enter captures the next key, `Esc` or a click elsewhere cancels, and capture runs above the window toggle and every navigation shortcut. A second live bind on the same key warns through `warn` and paints the chip in `danger`.
 - Hiding a keybind row cancels capture instead of leaving the window deaf to its own shortcut.
+- `Section:Progress`: a read-only bar with an optional label and readout, clamped to `min..max`. It has no pointer handlers and no focus, so it cannot be dragged or tabbed into.
+- `Section:Table`: virtualized data table. 1000 rows keep the row pool at visible+2 and the canvas carries the height; columns split by weight; clicking selects, Up/Down walk the selection and Enter fires `onSelect`.
+- `Table` exposes `SetRows`, `SetSelected`, `ScrollToIndex`, `SetVisible`, `Focus`, `Blur` and `GetSelectedRow`. `SetRows` never fires `onSelect`.
 - `density = "auto"` reads the last input type and picks `comfortable` for touch and gamepad, `compact` for keyboard and mouse.
 - App level `toggleKey`, overridable per window.
 - `density` and `toggleKey` are exposed on the returned App so a caller can confirm what was resolved without duplicating the measurement.
-- 138 headless specs, including a 500-option open measured against the 16ms frame budget and the full keybind capture path.
+- 153 headless specs, including a 500-option open measured against the 16ms frame budget, a 1000-row table held to a fixed instance count, and the full keybind capture path.
 
 ## 0.1.0
 

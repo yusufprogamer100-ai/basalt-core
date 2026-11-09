@@ -18,6 +18,8 @@ require(script.Parent.specs.keyboard)(h)
 require(script.Parent.specs.layer)(h)
 require(script.Parent.specs.dropdown)(h)
 require(script.Parent.specs.keybind)(h)
+require(script.Parent.specs.progress)(h)
+require(script.Parent.specs.table)(h)
 
 local ok = h:run()
 

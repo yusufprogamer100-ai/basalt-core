@@ -16,6 +16,7 @@ export type Focusable = {
 	SetFocus: (self: any, value: boolean) -> (),
 	Activate: ((self: any) -> ())?,
 	Nudge: ((self: any, direction: number) -> ())?,
+	HandleArrow: ((self: any, direction: string) -> boolean)?,
 	Capture: ((self: any) -> ())?,
 }
 

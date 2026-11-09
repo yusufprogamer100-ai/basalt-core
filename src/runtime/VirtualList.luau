@@ -43,6 +43,7 @@ export type VirtualList = {
 	Refresh: (self: VirtualList, force: boolean?) -> (),
 	ScrollToIndex: (self: VirtualList, index: number) -> (),
 	RowFor: (self: VirtualList, index: number) -> Instance?,
+	IndexFor: (self: VirtualList, row: Instance) -> number?,
 	VisibleRange: (self: VirtualList) -> (number, number),
 	Destroy: (self: VirtualList) -> (),
 	_grow: (self: VirtualList, poolSize: number) -> (),
@@ -220,6 +221,10 @@ function VirtualList:RowFor(index: number): Instance?
 	end
 
 	return nil
+end
+
+function VirtualList:IndexFor(row: Instance): number?
+	return self._indices[row]
 end
 
 function VirtualList:VisibleRange(): (number, number)
