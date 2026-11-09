@@ -10,15 +10,16 @@ Basalt is built around one idea: an interface is a surface, not a decoration. Tw
 
 - `Window`, `Tab`, `Section` containers with drag, resize, minimize and one seam.
 - `Label`, `Divider`, `Badge`, `Spacer` for structure.
-- `Button`, `Toggle`, `Slider`, `Input` and `Dropdown` as interactive controls.
+- `Button`, `Toggle`, `Slider`, `Input`, `Dropdown` and `Keybind` as interactive controls.
 - Dropdowns keep a fixed row pool: 500 options are a canvas height and eight recycled rows, not 500 instances. The popup opens inside the window overlay, flips above when there is no room below, and closes on an outside click.
+- `Keybind` captures the next key above every other shortcut, so binding `RightShift` or `Tab` does not hide the window or move focus. `Esc` or a click elsewhere cancels. Two live binds on one key warn and mark the chip instead of failing silently.
 - One state contract for every control: `default`, `hover`, `pressed`, `focused`, `disabled`, `selected`, `invalid`.
-- Keyboard focus with a visible ring, Tab/Shift+Tab, arrow navigation, Enter/Space activation, `/` search, `1..9` tab shortcuts and a configurable show/hide key. An open dropdown owns Up/Down/Enter/Escape until it closes.
+- Keyboard focus with a visible ring, Tab/Shift+Tab, arrow navigation, Enter/Space activation, `/` search, `1..9` tab shortcuts and a configurable show/hide key. An open dropdown owns Up/Down/Enter/Escape until it closes; a capturing keybind owns the very next key.
 - Compact and comfortable density. Comfortable rows are 44px, the touch target the platform asks for.
 - Three themes: `graphite` (dark), `bone` (light), `signal` (high contrast).
-- Contrast is measured in tests, not claimed in this file.
+- Contrast is measured in tests, not claimed in this file. 138 headless specs cover layout, focus, overlays, virtualized lists and keystroke routing.
 
-Not shipped yet: keybinds, color picker, table, console, modal, config persistence, access gate. None of them are advertised as working above.
+Not shipped yet: color picker, table, console, modal, config persistence, access gate. None of them are advertised as working above.
 
 ## Install
 
@@ -55,10 +56,17 @@ section:dropdown({
 	value = "Balanced",
 	onChange = function(value) print(value) end,
 })
+section:keybind({
+	text = "Toggle aim",
+	value = Enum.KeyCode.T,
+	onChange = function(key) print(key) end,
+})
 section:button({ text = "Apply", variant = "primary", onClick = function() end })
 ```
 
 `Dropdown` takes `options` (strings or `{ text, value, disabled }`), `value`, `multi`, `maxRows` and `onChange`. With `multi = true` the value is an array and the popup stays open while the user toggles rows.
+
+`Keybind` takes `text`, `value` (an `Enum.KeyCode`), `enabled` and `onChange`. Clicking the row or pressing `Enter` starts capture; the next keyboard key becomes the value and fires `onChange`. `SetValue` changes the bind without firing `onChange`, so loading a config does not call your callback.
 
 `Basalt.new` accepts `theme`, `density` (`auto`, `compact` or `comfortable`), `motion` (`full` or `reduced`), `toggleKey` and `displayOrder`. `density = "auto"` reads the last input type: touch and gamepad get comfortable rows, keyboard and mouse get compact rows. The resolved density and key are exposed as `app.density` and `app.toggleKey`.
 
@@ -69,7 +77,7 @@ section:button({ text = "Apply", variant = "primary", onClick = function() end }
 | `Tab` / `Shift+Tab` | Move focus forward/back, wrapping inside the window |
 | `Arrow keys` | Move focus by geometry; left/right nudges a focused slider; up/down walks an open dropdown |
 | `Enter` / `Space` | Activate the focused control, or choose the highlighted dropdown row |
-| `Esc` | Leave the focused field, close the top overlay, or clear focus |
+| `Esc` | Cancel a capturing keybind, leave the focused field, close the top overlay, or clear focus |
 | `/` | Focus the search field, once one is registered with `win:SetSearch` |
 | `1..9` | Select a tab |
 | `RightShift` | Show/hide. If taken, the next window claims `RightControl`, then `Insert` |

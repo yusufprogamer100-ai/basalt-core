@@ -32,6 +32,7 @@ local Fixture = {
 	Slider = require(script.Parent.Parent.components.Slider),
 	Input = require(script.Parent.Parent.components.Input),
 	Dropdown = require(script.Parent.Parent.components.Dropdown),
+	Keybind = require(script.Parent.Parent.components.Keybind),
 	Section = require(script.Parent.Parent.components.Section),
 	Tab = require(script.Parent.Parent.components.Tab),
 	Basalt = require(script.Parent.Parent.init),

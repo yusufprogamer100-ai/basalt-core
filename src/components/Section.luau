@@ -14,6 +14,7 @@ local Toggle = require(script.Parent.Toggle)
 local Slider = require(script.Parent.Slider)
 local Input = require(script.Parent.Input)
 local Dropdown = require(script.Parent.Dropdown)
+local Keybind = require(script.Parent.Keybind)
 local Label = require(script.Parent.Label)
 local Divider = require(script.Parent.Divider)
 local Badge = require(script.Parent.Badge)
@@ -42,6 +43,7 @@ export type Section = {
 	Input: (self: Section, config: Input.Config?) -> Input.Input,
 	Dropdown: (self: Section, config: Dropdown.Config?) -> Dropdown.Dropdown,
 	MultiDropdown: (self: Section, config: Dropdown.Config?) -> Dropdown.Dropdown,
+	Keybind: (self: Section, config: Keybind.Config?) -> Keybind.Keybind,
 	Label: (self: Section, config: Label.Config?) -> Label.Label,
 	Divider: (self: Section, config: Divider.Config?) -> Divider.Divider,
 	Badge: (self: Section, config: Badge.Config?) -> Badge.Badge,
@@ -190,6 +192,10 @@ function Section:MultiDropdown(config: Dropdown.Config?): Dropdown.Dropdown
 	merged.multi = true
 
 	return self:Dropdown(merged)
+end
+
+function Section:Keybind(config: Keybind.Config?): Keybind.Keybind
+	return attach(self, Keybind.new(self.surface, config))
 end
 
 function Section:Label(config: Label.Config?): Label.Label

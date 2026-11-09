@@ -1084,6 +1084,7 @@ function Mock.Reset()
 	local ok, env = pcall(getfenv, 0)
 	if ok and type(env) == "table" then
 		env.__BASALT_KEY_CLAIMS = nil
+		env.__BASALT_KEYBIND_KEYS = nil
 	end
 
 	for name, value in pairs(DEFAULT_CAPABILITIES) do

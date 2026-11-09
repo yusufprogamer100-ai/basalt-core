@@ -486,6 +486,20 @@ function Window:HandleInput(input: any, gameProcessed: boolean?): boolean
 
 	local box = focusedBox()
 
+	-- Capture runs above the toggle key and every navigation shortcut, because
+	-- the user is explicitly binding a key. The component answers false when it
+	-- is not capturing, so this costs one method check otherwise.
+	local capturing = self._focus:Current()
+
+	if
+		not box
+		and capturing
+		and type(capturing.CaptureKey) == "function"
+		and capturing:CaptureKey(input)
+	then
+		return true
+	end
+
 	if
 		self.toggleKey
 		and input.UserInputType == Enum.UserInputType.Keyboard
