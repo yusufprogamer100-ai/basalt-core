@@ -1,0 +1,115 @@
+--!strict
+-- Basalt / design / Tokens
+-- A theme is a contract, not a color swap. If a required color is missing the
+-- theme is rejected and the reason is printed. Silent fallbacks hide bugs.
+
+export type Density = "compact" | "comfortable"
+
+export type Validation = {
+	ok: boolean,
+	missing: { string },
+}
+
+local Tokens = {}
+
+Tokens.RequiredColors = {
+	"frame",
+	"well",
+	"raised",
+	"seam",
+	"seamStrong",
+	"ink",
+	"muted",
+	"faint",
+	"accent",
+	"accentInk",
+	"danger",
+	"success",
+	"focus",
+	"scrim",
+	"selected",
+}
+
+-- 4px rhythm. Every value below is a multiple of 2 so half-pixel seams stay
+-- crisp at any UIScale.
+Tokens.Space = {
+	xxs = 2,
+	xs = 4,
+	sm = 6,
+	md = 8,
+	lg = 12,
+	xl = 16,
+	xxl = 24,
+}
+
+Tokens.Size = {
+	header = { compact = 44, comfortable = 48 },
+	row = { compact = 32, comfortable = 44 },
+	rail = { compact = 148, comfortable = 160 },
+	gap = { compact = 8, comfortable = 10 },
+	pad = { compact = 12, comfortable = 14 },
+	radiusPanel = 3,
+	radiusControl = 2,
+	seam = 1,
+	toggleWidth = 30,
+	toggleHeight = 16,
+	toggleKnob = 12,
+	sliderTrack = 4,
+	sliderKnob = 12,
+	badge = 16,
+}
+
+Tokens.Text = {
+	title = 15,
+	body = 13,
+	small = 11,
+	micro = 10,
+	mono = 11,
+}
+
+function Tokens.Validate(theme: { name: string?, colors: { [string]: string } }): Validation
+	local missing: { string } = {}
+
+	if type(theme) ~= "table" then
+		return { ok = false, missing = { "theme" } }
+	end
+
+	if type(theme.name) ~= "string" then
+		table.insert(missing, "name")
+	end
+
+	if type(theme.colors) ~= "table" then
+		return { ok = false, missing = { "colors" } }
+	end
+
+	for _, key in ipairs(Tokens.RequiredColors) do
+		local value = theme.colors[key]
+		if type(value) ~= "string" or not string.match(value, "^#%x%x%x%x%x%x$") then
+			table.insert(missing, key)
+		end
+	end
+
+	return { ok = #missing == 0, missing = missing }
+end
+
+function Tokens.Row(density: Density): number
+	return Tokens.Size.row[density]
+end
+
+function Tokens.Rail(density: Density): number
+	return Tokens.Size.rail[density]
+end
+
+function Tokens.Gap(density: Density): number
+	return Tokens.Size.gap[density]
+end
+
+function Tokens.Pad(density: Density): number
+	return Tokens.Size.pad[density]
+end
+
+function Tokens.Header(density: Density): number
+	return Tokens.Size.header[density]
+end
+
+return Tokens

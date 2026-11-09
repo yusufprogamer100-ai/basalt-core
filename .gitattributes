@@ -1,0 +1,10 @@
+# Basalt is distributed as a single Lua file. Keep the working tree identical
+# on every platform so the committed dist matches what the bundler wrote.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.zip binary
+
+dist/* linguist-generated=true
+dist/*.lua -diff

@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  LUAU_VERSION: "0.746"
+  STYLUA_VERSION: "2.6.0"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Luau and StyLua
+        run: |
+          curl -fsSL -o luau.zip "https://github.com/luau-lang/luau/releases/download/${LUAU_VERSION}/luau-ubuntu.zip"
+          unzip -q luau.zip -d .luau
+          curl -fsSL -o stylua.zip "https://github.com/JohnnyMorganz/StyLua/releases/download/v${STYLUA_VERSION}/stylua-linux-x86_64.zip"
+          unzip -q stylua.zip -d .stylua
+          chmod +x .luau/luau .luau/luau-compile .stylua/stylua
+
+      - name: Format
+        run: ./.stylua/stylua --check src tests scripts
+
+      - name: Build
+        run: node scripts/build.mjs
+
+      - name: Syntax
+        run: find src tests -name '*.luau' -print0 | xargs -0 -n1 ./.luau/luau-compile --binary > /dev/null
+
+      - name: Tests
+        run: ./.luau/luau .build/tests.luau
