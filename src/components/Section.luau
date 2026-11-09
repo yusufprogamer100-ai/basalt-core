@@ -17,6 +17,8 @@ local Dropdown = require(script.Parent.Dropdown)
 local Keybind = require(script.Parent.Keybind)
 local Progress = require(script.Parent.Progress)
 local Table = require(script.Parent.Table)
+local Console = require(script.Parent.Console)
+local ColorPicker = require(script.Parent.ColorPicker)
 local Label = require(script.Parent.Label)
 local Divider = require(script.Parent.Divider)
 local Badge = require(script.Parent.Badge)
@@ -48,6 +50,8 @@ export type Section = {
 	Keybind: (self: Section, config: Keybind.Config?) -> Keybind.Keybind,
 	Progress: (self: Section, config: Progress.Config?) -> Progress.Progress,
 	Table: (self: Section, config: Table.Config?) -> Table.Table,
+	Console: (self: Section, config: Console.Config?) -> Console.Console,
+	ColorPicker: (self: Section, config: ColorPicker.Config?) -> ColorPicker.ColorPicker,
 	Label: (self: Section, config: Label.Config?) -> Label.Label,
 	Divider: (self: Section, config: Divider.Config?) -> Divider.Divider,
 	Badge: (self: Section, config: Badge.Config?) -> Badge.Badge,
@@ -208,6 +212,14 @@ end
 
 function Section:Table(config: Table.Config?): Table.Table
 	return attach(self, Table.new(self.surface, config))
+end
+
+function Section:Console(config: Console.Config?): Console.Console
+	return attach(self, Console.new(self.surface, config))
+end
+
+function Section:ColorPicker(config: ColorPicker.Config?): ColorPicker.ColorPicker
+	return attach(self, ColorPicker.new(self.surface, config, self._focus))
 end
 
 function Section:Label(config: Label.Config?): Label.Label

@@ -20,6 +20,8 @@ require(script.Parent.specs.dropdown)(h)
 require(script.Parent.specs.keybind)(h)
 require(script.Parent.specs.progress)(h)
 require(script.Parent.specs.table)(h)
+require(script.Parent.specs.console)(h)
+require(script.Parent.specs.colorpicker)(h)
 
 local ok = h:run()
 

@@ -10,18 +10,20 @@ Basalt is built around one idea: an interface is a surface, not a decoration. Tw
 
 - `Window`, `Tab`, `Section` containers with drag, resize, minimize and one seam.
 - `Label`, `Divider`, `Badge`, `Spacer` for structure.
-- `Button`, `Toggle`, `Slider`, `Input`, `Dropdown`, `Keybind` and `Table` as interactive controls.
+- `Button`, `Toggle`, `Slider`, `Input`, `Dropdown`, `Keybind`, `Table`, `ColorPicker` and `Console` as interactive controls.
 - `Progress` as a read-only status bar; it never takes focus or a pointer, so it cannot be dragged by accident.
 - Tables keep a fixed row pool: 1000 rows are a canvas height and eight row instances. Column widths are weights, so the layout needs no measurement pass.
+- `ColorPicker` uses three HSV sliders in an inline panel instead of a floating gradient square, so every channel is reachable by keyboard and touch. The HSV math is plain arithmetic, tested without an engine.
+- `Console` keeps new lines in view only while the user is already at the bottom; scrolling up to read is never yanked back.
 - Dropdowns keep a fixed row pool: 500 options are a canvas height and eight recycled rows, not 500 instances. The popup opens inside the window overlay, flips above when there is no room below, and closes on an outside click.
 - `Keybind` captures the next key above every other shortcut, so binding `RightShift` or `Tab` does not hide the window or move focus. `Esc` or a click elsewhere cancels. Two live binds on one key warn and mark the chip instead of failing silently.
 - One state contract for every control: `default`, `hover`, `pressed`, `focused`, `disabled`, `selected`, `invalid`.
 - Keyboard focus with a visible ring, Tab/Shift+Tab, arrow navigation, Enter/Space activation, `/` search, `1..9` tab shortcuts and a configurable show/hide key. An open dropdown owns Up/Down/Enter/Escape until it closes; a capturing keybind owns the very next key; a focused table uses Up/Down for its selection.
 - Compact and comfortable density. Comfortable rows are 44px, the touch target the platform asks for.
 - Three themes: `graphite` (dark), `bone` (light), `signal` (high contrast).
-- Contrast is measured in tests, not claimed in this file. 153 headless specs cover layout, focus, overlays, virtualized lists and keystroke routing.
+- Contrast is measured in tests, not claimed in this file. 168 headless specs cover layout, focus, overlays, virtualized lists and keystroke routing.
 
-Not shipped yet: color picker, console, modal, config persistence, access gate. None of them are advertised as working above.
+Not shipped yet: modal, tooltip, context menu, search field, config panel, access gate. None of them are advertised as working above.
 
 ## Install
 
@@ -70,6 +72,10 @@ section:table({
 	height = 160,
 	onSelect = function(row) print(row.name) end,
 })
+local accent = section:colorpicker({ text = "Accent", value = Color3.fromRGB(96, 148, 224) })
+local log = section:console({ title = "Output", height = 120 })
+log:Log("loaded", "success")
+log:Log("retrying", "warn")
 section:button({ text = "Apply", variant = "primary", onClick = function() end })
 ```
 
@@ -80,6 +86,10 @@ section:button({ text = "Apply", variant = "primary", onClick = function() end }
 `Progress` takes `text`, `value`, `min`, `max`, `suffix` and `tone` (`accent`, `success`, `danger`, `muted`). Without `text` it renders as a bare bar.
 
 `Table` takes `columns` (`{ text, key, weight, align, mono }`), `rows`, `height`, `rowHeight`, `selected` and `onSelect`. Column width is a weight, not a pixel value, so the columns fill the row without a measurement pass. Clicking a row selects it; `Enter` fires `onSelect` for the selected row. `SetRows` is silent, which keeps a live table from firing selection callbacks on every refresh.
+
+`ColorPicker` takes `text`, `value` and `onChange`. Clicking the row opens an inline panel with Hue/Saturation/Brightness sliders and a live preview; the sliders join the tab order only while the panel is open. `SetValue` is silent.
+
+`Console` takes `title`, `height`, `rowHeight`, `maxLines` (ring buffer, default 200), `timestamps` and `follow`. `Log(text, level)` accepts `info`, `warn`, `error` and `success`; unknown levels fall back to `info`. `Clear` empties the buffer, and the newest line only auto-scrolls when the view was already at the bottom.
 
 `Basalt.new` accepts `theme`, `density` (`auto`, `compact` or `comfortable`), `motion` (`full` or `reduced`), `toggleKey` and `displayOrder`. `density = "auto"` reads the last input type: touch and gamepad get comfortable rows, keyboard and mouse get compact rows. The resolved density and key are exposed as `app.density` and `app.toggleKey`.
 
